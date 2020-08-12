@@ -1,2 +1,2 @@
-# groupSharedSpace
+# Project info
 SocialCars project code
