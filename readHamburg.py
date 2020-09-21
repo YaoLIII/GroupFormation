@@ -27,6 +27,14 @@ user_id = np.unique(df['user_id'].values)
 data = [df.loc[df['user_id'] == id].iloc[:,2:].values for id in user_id]
 # the order of user is its id-10001
 tpdata = [data[i] for i in ped_id-10001]
+cardata = [data[i] for i in car_id-10001]
+cycdata = [data[i] for i in cyc_id-10001]
 
 for i in tpdata:
+    plt.plot(i[:,1],i[:,2])
+    
+for i in cardata:
+    plt.plot(i[:,1],i[:,2])
+    
+for i in cycdata:
     plt.plot(i[:,1],i[:,2])
