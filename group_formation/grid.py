@@ -50,7 +50,7 @@ def plotODdata(user_type):
     return None
 
 # read data
-data_dir = "./data/Federico/dump/Hamburg_dataset.csv"
+data_dir = "../data/Federico/dump/Hamburg_dataset.csv"
 df = pd.read_csv(data_dir)
 
 cyc = df[df['user_type']=='cyclist   ']
