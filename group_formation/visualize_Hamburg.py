@@ -12,7 +12,7 @@ import matplotlib.animation as animation
 from matplotlib.font_manager import FontProperties
 
 # read data
-data_dir = "./data/Federico/dump/Hamburg_dataset.csv"
+data_dir = "../data/Federico/dump/Hamburg_dataset.csv"
 df = pd.read_csv(data_dir)
 
 print('column names are: '+str(list(df.columns)))
@@ -25,8 +25,8 @@ ymax = max(df['y_axis'])
 
 # create canvas
 fig, ax = plt.subplots()
-img = plt.imread("img/background_Bergedorf.png")
-# img = plt.imread("img/background_map.png")
+img = plt.imread("../fig/background_Bergedorf.png")
+# img = plt.imread("../fig/background_map.png")
 
 scat = ax.scatter(0,0)
 
