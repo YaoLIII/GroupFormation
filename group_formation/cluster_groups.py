@@ -43,15 +43,30 @@ def plotODdata(data, user_type = None):
     if user_type:
         data = data[data['user_type']==user_type]
     
-    # visualization
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(data['x_ori'], data['y_ori'], data['t_ori'], c = 'cyan')
-    # ax.scatter(data['x_des'], data['y_des'], data['t_des'], c = 'green')
+    # # visualization 3D
+    # fig = plt.figure()
+    # ax = fig.add_subplot(111, projection='3d')
+    # ax.scatter(data['x_ori'], data['y_ori'], data['t_ori'], c = 'cyan')
+    # # ax.scatter(data['x_des'], data['y_des'], data['t_des'], c = 'green')
     
-    ax.set_xlabel('X [m]')
-    ax.set_ylabel('Y [m]')
-    ax.set_zlabel('Time [s]')
+    # ax.set_xlabel('X [m]')
+    # ax.set_ylabel('Y [m]')
+    # ax.set_zlabel('Time [s]')
+    
+    # visualization 2D
+    fig, ax = plt.subplots()
+    img = plt.imread("../fig/background_Bergedorf.png")
+    
+    xmin = min(data['x_ori'])
+    xmax = max(data['x_ori'])
+    ymin = min(data['y_ori'])
+    ymax = max(data['y_ori'])
+    
+    # scat = ax.scatter(0,0)
+    ax.set_xlim(xmin,xmax)
+    ax.set_ylim(ymin,ymax)
+    ax.imshow(img, extent=[xmin, xmax, ymin, ymax])
+    ax.scatter(data['x_ori'],data['y_ori'], s=3)
     
     plt.show()
     
@@ -63,10 +78,16 @@ def initGroup(data, delta_t = 120, delta_s = 10):
     range_t = [math.floor(min(data[:,2])), math.ceil(max(data[:,2]))]
     range_x = [math.floor(min(data[:,0])), math.ceil(max(data[:,0]))]
     range_y = [math.floor(min(data[:,1])), math.ceil(max(data[:,1]))]
-    
+    # 这里似乎没有人工划定范围效果好
     slice_t = np.linspace(range_t[0],range_t[-1],int((range_t[-1]-range_t[0])/delta_t))
     slice_x = np.linspace(range_x[0],range_x[-1],int((range_x[-1]-range_x[0])/delta_s))
     slice_y = np.linspace(range_y[0],range_y[-1],int((range_y[-1]-range_y[0])/delta_s))
+    
+    xx,yy = np.meshgrid(slice_x,slice_y)
+    plt.plot(xx, yy, color='k') # use plot, not scatter
+    plt.plot(np.transpose(xx), np.transpose(yy), marker='.', color='k') # add this here
+    plt.show()
+
     # locate OD data at spatial-temporal cube (dict:{(idx,idy,idt):user_id})
     location = {}
     for count, point in enumerate(data):
@@ -114,7 +135,7 @@ if __name__ == "__main__":
     des = np.asarray(data.iloc[:,[6,7,5]])
     # ori[:,2] = ori[:,2]/50
     
-    location = initGroup(ori, delta_t = 120, delta_s = 10)
+    location = initGroup(ori, delta_t = 360, delta_s = 4)
     
     # # Try to cluster with DBSCAN - fail
     # model = DBSCAN(eps=2, min_samples=5)
