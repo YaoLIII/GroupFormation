@@ -61,30 +61,30 @@ for file in files:
                 info = [id, oframe, ox, oy, dframe, ox, dy, av, t]
                 user_info.append(info)
             
-        df1 = pd.DataFrame (user_info,columns=['track_id', 'oframe', 'ox', 'oy', 'dframe', 'dx', 'dy', 'av', 'type'])
-        df1.to_csv(output_dir + file + '.csv', sep=',', header=True, index=False)
-        
-        # calculate the average speed of all types of road users
-        av_table = []
-        for user_type in df1['type'].unique():
-            all_av = df1[df1['type']==user_type]['av']
-            type_mean = all_av.mean()
-            av_table.append([user_type,type_mean])
-        df2 = pd.DataFrame (av_table,columns=['type','av'])
-        df2.to_csv(output_dir + file + '_average_speed_' + '.csv', sep=',', header=True, index=False)
-        
-        # plot the OD data
-        img = plt.imread( path + file + '/' + background )
-        colors = {'Pedestrian':'red', 'Cart':'green', 'Biker':'blue', 'Skater':'yellow', 'Car':'grey', 'Bus':'purple'}
-        
-        fig, axs = plt.subplots(2)
-        
-        axs[0].set_title('Origin data of ' + sample + ' ' + file)
-        axs[0].imshow(img)
-        axs[0].scatter(df1['ox'],df1['oy'], c=df1['type'].map(colors),s = 3)
-        
-        axs[1].set_title('Destination data of ' + sample + ' ' + file)
-        axs[1].imshow(img)
-        axs[1].scatter(df1['dx'],df1['dy'], c=df1['type'].map(colors),s = 3)
-        
-        plt.show()
+    df1 = pd.DataFrame (user_info,columns=['track_id', 'oframe', 'ox', 'oy', 'dframe', 'dx', 'dy', 'av', 'type'])
+    df1.to_csv(output_dir + file + '.csv', sep=',', header=True, index=False)
+    
+    # calculate the average speed of all types of road users
+    av_table = []
+    for user_type in df1['type'].unique():
+        all_av = df1[df1['type']==user_type]['av']
+        type_mean = all_av.mean()
+        av_table.append([user_type,type_mean])
+    df2 = pd.DataFrame (av_table,columns=['type','av'])
+    df2.to_csv(output_dir + file + '_average_speed_' + '.csv', sep=',', header=True, index=False)
+    
+    # plot the OD data
+    img = plt.imread( path + file + '/' + background )
+    colors = {'Pedestrian':'red', 'Cart':'green', 'Biker':'blue', 'Skater':'yellow', 'Car':'grey', 'Bus':'purple'}
+    
+    fig, axs = plt.subplots(2)
+    
+    axs[0].set_title('Origin data of ' + sample + ' ' + file)
+    axs[0].imshow(img)
+    axs[0].scatter(df1['ox'],df1['oy'], c=df1['type'].map(colors),s = 3)
+    
+    axs[1].set_title('Destination data of ' + sample + ' ' + file)
+    axs[1].imshow(img)
+    axs[1].scatter(df1['dx'],df1['dy'], c=df1['type'].map(colors),s = 3)
+    
+    plt.show()
