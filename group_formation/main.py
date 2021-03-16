@@ -23,8 +23,16 @@ file = files[0]
 avg_info = files[1]
 print('start to deal with '+ file + '...')
 
-df = pd.read_csv(output_dir+file, delimiter=',')
-df2 = pd.read_csv(output_dir+avg_info, delimiter=',')
+data = pd.read_csv(output_dir+file, delimiter=',')
+avg_info = pd.read_csv(output_dir+avg_info, delimiter=',')
+
+## convert df to numpy array
+# replace type by numbers
+user_type = data.type.unique()
+type_dict = dict(zip(user_type, range(len(user_type))))
+data = data.replace({'type':type_dict})
+# [id, oframe, ox, oy, dframe, dx, dy, avg_v, type]
+data = np.asarray(data)
 
 # split data via waitting time
 waiting = 20
