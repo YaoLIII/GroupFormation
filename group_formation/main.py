@@ -11,6 +11,7 @@ import pandas as pd
 import numpy as np
 import os
 import time
+import random
 
 # read processed data
 sample = 'deathCircle'
@@ -25,5 +26,8 @@ print('start to deal with '+ file + '...')
 df = pd.read_csv(output_dir+file, delimiter=',')
 df2 = pd.read_csv(output_dir+avg_info, delimiter=',')
 
-# give data as a stream
+# split data via waitting time
+waiting = 20
+f = 5
+
 
