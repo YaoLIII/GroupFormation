@@ -114,11 +114,10 @@ def meyersonmanytimes(data, dimension, f, times,facil,overcount):
             minimum=run
     return minimum
 
-def DFL(data,dimension,f,n,timesrecompute,window,filename):
+def DFL(data,dimension,f,n,timesrecompute,window,filename,th_group,th_waiting):
     filename='S'+filename
     g = open(filename,'w+')
-    print('dfl')
-    currentdata=data[:100]
+    # currentdata=data[:100]
     lastcost=0
     currentcost=0
     lasttime=0
@@ -129,8 +128,58 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename):
     facils = []
     TotalNumberofCentersOpened=0
     start = time.time()
+    
+    # flag = 0
+    # i = 0
+    
+    # while flag < len(data):
+    #     waiting_period = data[:,1]-data[flag,1]
+    #     if np.where(waiting_period>th_waiting)[0].size >0:
+    #         waiting_bound = np.where(waiting_period>th_waiting)[0][0] #idx: waiting time over th_waiting
+    #         currentdata = data[flag:waiting_bound]
+    #         if len(currentdata) > th_group:
+    #             currentdata = currentdata[:th_group] # reach th_group can start moving
+    #         flag += len(currentdata)
+    #     else:
+    #         currentdata = data[flag:]
+    #         flag += len(currentdata)
+    #     # print(len(currentdata))
+        
+    #     if i-lasttime>howlong:
+    #         lastfacil,lastcost,holder,overcount=meyersonmanytimes(currentdata,dimension,f,timesrecompute,currentfacil,overcount)
+    #         howlong=4*lastcost/f
+    #         TotalNumberofCentersOpened+=holder
+    #         #print(howlong)
+    #         lasttime=i
+    #         currentcost=lastcost
+    #         TotalRecompute+=1
+    #         currentfacil=lastfacil
+    #     else:
+    #         # print(data[i-1],currentfacil)
+    #         currentcost-=closest_node_dist(data[i-1],currentfacil)
+    #         nearest=closest_node_dist(data[i+window-1],currentfacil)
+    #         if nearest<f:
+    #             currentcost=currentcost+nearest
+    #         else:
+    #             currentcost=currentcost+f
+    #             TotalNumberofCentersOpened+=1
+    #             currentfacil.append(data[i+window-1])
+                
+    #     facils.append(currentfacil)   # 这里有问题
+    #     print(len(currentfacil))
+        
+    #     #print(currentcost, costReMey)
+    #     if i%100==0:
+    #          print(i,TotalNumberofCentersOpened,currentcost, time.time()-start,howlong,overcount)
+    #     g.write(str(i)+ " "+str(currentcost)+ " " + str(TotalNumberofCentersOpened) + " "+  str(time.time()-start)+ '\n')
+        
+    #     i = i + 1
+        
+    # return facils
+        
     for i in range(0,n-window):
         currentdata=data[i:i+window]
+        
         if i-lasttime>howlong:
             lastfacil,lastcost,holder,overcount=meyersonmanytimes(currentdata,dimension,f,timesrecompute,currentfacil,overcount)
             howlong=4*lastcost/f
@@ -151,11 +200,11 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename):
                 TotalNumberofCentersOpened+=1
                 currentfacil.append(data[i+window-1])
                 
-        facils.append(currentfacil)   # 这里有问题
+        facils.append(list(currentfacil))   # 这里有问题
         print(len(currentfacil))
         #print(currentcost, costReMey)
         if i%100==0:
-             print(i,TotalNumberofCentersOpened,currentcost, time.time()-start,howlong,overcount)
+              print(i,TotalNumberofCentersOpened,currentcost, time.time()-start,howlong,overcount)
         g.write(str(i)+ " "+str(currentcost)+ " " + str(TotalNumberofCentersOpened) + " "+  str(time.time()-start)+ '\n')
         
         
@@ -164,9 +213,4 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename):
 if __name__ == "__main__":
     sample_num = 20
     f = 100
-    
-    centers = inital_solution(sample_num, data, f)
-    d = OD_similarity(centers[0], centers[1])
-    centers = updateCenters(data[180], centers, f)
 
-# 为何t = np.asarray(facils[0])会有超过1000的中心点？append 会同时更新所有 facil的数量

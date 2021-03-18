@@ -37,20 +37,25 @@ data = data.replace({'type':type_dict})
 # [id, oframe, ox, oy, dframe, dx, dy, avg_v, type]
 data = np.asarray(data.sort_values('oframe'))
 
-# split data via waitting time
-waiting = 20
-f = 5
-file = 'test'
+# split data via waitting time or group member numbers
+th_waiting = 50
+th_group = 20
+
 dimension = 2
 openingcost = 100
 numberofiterations = 664
 windowsize = 50
 file = 'test'
 
-facils = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file)
-np.save(output_dir + 'facilities_result.npy', facils)
+facils = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_group,th_waiting)
 
-V.plotResult(data, facils)
+facils_loc = [np.asarray(i)[:,2:4] for i in facils]
+facil_frames = data[:,1][:len(facils)]
+facil_info = [np.c_[facil_frames[i]*np.ones(len(facils_loc[i])).reshape((-1,1)),facils_loc[i]] for i in range(len(facils_loc))]
+facil_info = np.asarray(facil_info)
+# np.save(output_dir + 'facilities_result.npy', facils)
+
+V.plotResult(data, facils_loc, facil_frames)
 
 # for i in facils[600:610]:
 #     j = np.asarray(i)
