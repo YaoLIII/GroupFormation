@@ -33,9 +33,9 @@ for file in files:
     
     user_info = []
     
-    for id in df['track_id'].unique():
+    for idx in df['track_id'].unique():
         # 直接提取x y 含有多个重复坐标，需要根据 lost!=1/occluded/generated 进行筛选
-        current_user = np.asarray(df[(df['track_id']==id) & (df['lost']!=1)])
+        current_user = np.asarray(df[(df['track_id']==idx) & (df['lost']!=1)])
         
         if len(current_user) > 1:   # has O&D
         
@@ -62,7 +62,7 @@ for file in files:
                 user_info.append(info)
             
     df1 = pd.DataFrame (user_info,columns=['track_id', 'oframe', 'ox', 'oy', 'dframe', 'dx', 'dy', 'av', 'type'])
-    df1.to_csv(output_dir + file + '.csv', sep=',', header=True, index=False)
+    # df1.to_csv(output_dir + file + '.csv', sep=',', header=True, index=False)
     
     # calculate the average speed of all types of road users
     av_table = []
@@ -71,7 +71,7 @@ for file in files:
         type_mean = all_av.mean()
         av_table.append([user_type,type_mean])
     df2 = pd.DataFrame (av_table,columns=['type','av'])
-    df2.to_csv(output_dir + file + '_average_speed_' + '.csv', sep=',', header=True, index=False)
+    # df2.to_csv(output_dir + file + '_average_speed_' + '.csv', sep=',', header=True, index=False)
     
     # plot the OD data
     img = plt.imread( path + file + '/' + background )

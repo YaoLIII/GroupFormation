@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Aug 12 16:54:35 2020
 
 @author: li
 """

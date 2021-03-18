@@ -117,7 +117,6 @@ def meyersonmanytimes(data, dimension, f, times,facil,overcount):
 def DFL(data,dimension,f,n,timesrecompute,window,filename):
     filename='S'+filename
     g = open(filename,'w+')
-    print('dfl')
     currentdata=data[:100]
     lastcost=0
     currentcost=0
@@ -126,7 +125,6 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename):
     howlong=-1
     TotalRecompute=0
     currentfacil=[]
-    facils = []
     TotalNumberofCentersOpened=0
     start = time.time()
     for i in range(0,n-window):
@@ -150,16 +148,11 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename):
                 currentcost=currentcost+f
                 TotalNumberofCentersOpened+=1
                 currentfacil.append(data[i+window-1])
-                
-        facils.append(currentfacil)   # 这里有问题
-        print(len(currentfacil))
+            
         #print(currentcost, costReMey)
         if i%100==0:
              print(i,TotalNumberofCentersOpened,currentcost, time.time()-start,howlong,overcount)
         g.write(str(i)+ " "+str(currentcost)+ " " + str(TotalNumberofCentersOpened) + " "+  str(time.time()-start)+ '\n')
-        
-        
-    return facils
 
 if __name__ == "__main__":
     sample_num = 20
@@ -168,5 +161,3 @@ if __name__ == "__main__":
     centers = inital_solution(sample_num, data, f)
     d = OD_similarity(centers[0], centers[1])
     centers = updateCenters(data[180], centers, f)
-
-# 为何t = np.asarray(facils[0])会有超过1000的中心点？append 会同时更新所有 facil的数量

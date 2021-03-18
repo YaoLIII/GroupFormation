@@ -12,6 +12,9 @@ import numpy as np
 import os
 import time
 import random
+import function as F
+import matplotlib.pyplot as plt
+import visualize_SDD as V 
 
 # read processed data
 sample = 'deathCircle'
@@ -32,10 +35,25 @@ user_type = data.type.unique()
 type_dict = dict(zip(user_type, range(len(user_type))))
 data = data.replace({'type':type_dict})
 # [id, oframe, ox, oy, dframe, dx, dy, avg_v, type]
-data = np.asarray(data)
+data = np.asarray(data.sort_values('oframe'))
 
 # split data via waitting time
 waiting = 20
 f = 5
+file = 'test'
+dimension = 2
+openingcost = 100
+numberofiterations = 664
+windowsize = 50
+file = 'test'
 
+facils = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file)
+np.save(output_dir + 'facilities_result.npy', facils)
 
+V.plotResult(data, facils)
+
+# for i in facils[600:610]:
+#     j = np.asarray(i)
+#     plt.plot(j[:,2],j[:,3],'.')
+        
+        
