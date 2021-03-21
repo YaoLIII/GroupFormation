@@ -28,6 +28,7 @@
     img = plt.imread('../data/stanford_campus_dataset/annotations/deathCircle/' + 'video0' + '/' + 'reference.jpg' )
     
     scat = ax.scatter(0,0)
+    # flag = 0
 
     def update(t):
         
@@ -38,18 +39,27 @@
         user_type = data[data[:,1]==t][:,-1].tolist()     
         user_id = data[data[:,1]==t][:,0].tolist()
         
-        # fx = 
+        # fx = facils_loc[flag][:,0].tolist()
+        # fy = facils_loc[flag][:,1].tolist()
+        
+        # flag += 1
         
         ax.clear()
         ax.set_title("Movements at time " + str(t))
         ax.set_xlim(xmin,xmax)
         ax.set_ylim(ymin,ymax)
         ax.imshow(img, extent=[xmin, xmax, ymin, ymax])
-        tuples = tuple([x[k],y[k]] for k in range(len(x)))
+        tuples = tuple([x[k],y[k]] for k in range(len(x)))        
         scat.set_offsets(tuples)
+        
+        # tuples_f = tuple([fx[k],fy[k]] for k in range(len(fx)))
+        # scat.set_offsets(tuples_f)
             
         for j in range(len(tuples)):
             ax.annotate(int(user_id[j]),tuples[j], size = 10)
+            
+        # for h in range(len(tuples_f)):
+        #     ax.annotate(tuples[j], size = 20)
             
         fontP = FontProperties()
         fontP.set_size('large')
@@ -87,7 +97,7 @@
         # plt.scatter([], [], s=40, color='k', marker='s', label='veh')
         # plt.legend(loc='lower right')
         
-    anim = animation.FuncAnimation(fig, update, frames = len(data[:,1]), \
+    anim = animation.FuncAnimation(fig, update, frames = data[:,1], \
                             interval = 2, repeat = False)
     plt.show()
 

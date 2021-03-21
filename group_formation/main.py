@@ -14,7 +14,7 @@ import time
 import random
 import function as F
 import matplotlib.pyplot as plt
-import visualize_SDD as V 
+# import visualize_SDD as V 
 
 # read processed data
 sample = 'deathCircle'
@@ -55,7 +55,7 @@ facil_info = [np.c_[facil_frames[i]*np.ones(len(facils_loc[i])).reshape((-1,1)),
 facil_info = np.asarray(facil_info)
 # np.save(output_dir + 'facilities_result.npy', facils)
 
-V.plotResult(data, facils_loc, facil_frames)
+# V.plotResult(data, facils_loc, facil_frames)
 
 # for i in facils[600:610]:
 #     j = np.asarray(i)
