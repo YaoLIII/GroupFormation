@@ -78,7 +78,6 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
                       np.sin(theta_goal), color='g', width=0.1)
             plot_vehicle(x, y, theta, x_traj, y_traj)
 
-
 def plot_vehicle(x, y, theta, x_traj, y_traj):  # pragma: no cover
     # Corners of triangular vehicle when pointing to the right (0 radians)
     p1_i = np.array([0.5, 0, 1]).T

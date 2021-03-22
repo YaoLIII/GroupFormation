@@ -200,8 +200,8 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_group,th_waiting):
                 TotalNumberofCentersOpened+=1
                 currentfacil.append(data[i+window-1])
                 
-        facils.append(list(currentfacil))   # 这里有问题
-        print(len(currentfacil))
+        facils.append(list(currentfacil)) 
+        # print(len(currentfacil))
         #print(currentcost, costReMey)
         if i%100==0:
               print(i,TotalNumberofCentersOpened,currentcost, time.time()-start,howlong,overcount)

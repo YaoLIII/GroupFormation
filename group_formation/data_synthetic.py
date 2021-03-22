@@ -12,6 +12,7 @@
 
 @author: yaoli
 """
+import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -92,11 +93,61 @@ def genInput(trajsWithId):
     df = pd.DataFrame (userInfo,columns=['track_id', 'oframe', 'ox', 'oy', 'dframe', 'dx', 'dy', 'av', 'type'])
     
     return df
+
+def plotPaths(userInfo, trajsWithId):
+
+    ox = userInfo['ox'].tolist()
+    oy = userInfo['oy'].tolist()
+    dx = userInfo['dx'].tolist()
+    dy = userInfo['dy'].tolist()
+    oframe = userInfo['oframe'].tolist()
+    dframe = userInfo['dframe'].tolist()
+    
+    frameRange = [min(oframe),max(dframe)]
+    
+    for f in np.arange(frameRange[0],frameRange[1]):
+        
+        existUser = userInfo[(userInfo['oframe']<=f) & (userInfo['dframe']>=f)]
+        existUserId = existUser['track_id']
+        existUserId = list(map(int,existUserId.tolist()))
+        
+        allTrajs = np.vstack(trajsWithId)
+        existUserTraj = [allTrajs[allTrajs[:,0]==i] for i in existUserId]
+        
+        userTrajSoFar = []
+        for t in existUserTraj:
+            userTrajSoFar.append(t[t[:,3]<=f])
+            
+        if show_animation:  # pragma: no cover
+            plt.cla()
+            plt.scatter(existUser['ox'].tolist(), existUser['oy'].tolist(), 
+                        color='g', marker='^')
+            # plt.scatter(existUser['dx'].tolist(), existUser['dy'].tolist(), 
+            #             color='r', marker='X')
+            
+            for subt in userTrajSoFar:
+                plt.plot(subt[:,1], subt[:,2], 'b--')
+                plt.plot(subt[-1,1], subt[-1,2], color='r', marker='X')
+                plt.annotate(str(int(subt[0,0])),
+                             (subt[-1,1], subt[-1,2]),
+                             textcoords="offset points",
+                             xytext=(0,5),
+                             ha='right')
+        
+            plt.xlim(min(ox)-2, max(ox)+2)
+            plt.ylim(min(oy)-2, max(oy)+2)
+            plt.title( "Movements at frame " + str(int(f)) )
+        
+            plt.pause(dt)
     
 if __name__ == "__main__":
     
-    mapSize = 30
-    trajNum = 20
+    output_dir ='../data/synthetic/'
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    
+    mapSize = 10
+    trajNum = 600
     firstFrame = 0
     trajs = genTrajSet(mapSize,trajNum,firstFrame) #list of [x,y,t]
     
@@ -111,44 +162,11 @@ if __name__ == "__main__":
     
     # trajs: list of vari-length traj [idx,x,y,frame]
     data = np.vstack(trajsWithId)
-
-    xmin = min(data[:,1]-2)
-    xmax = max(data[:,1]+2)
-    ymin = min(data[:,2]-2)
-    ymax = max(data[:,2]+2)
     
-    # create canvas
-    fig, ax = plt.subplots()    
-    scat = ax.scatter(0,0)
-    # flag = 0
-
-    def update(t):
+    np.save(output_dir+'synthetic_mapSize'+str(mapSize)+'_trajsWithId'+'.npy', data)
+    userInfo.to_csv(output_dir+'synthetic_mapSize'+str(mapSize)+'_userInfo'+'.csv',index=False)   
     
-        x = data[data[:,3]==t][:,1].tolist()
-        y = data[data[:,3]==t][:,2].tolist()
-        # user_type = data[data[:,3]==t][:,-1].tolist()     
-        user_id = data[data[:,3]==t][:,0].tolist()
-        
-        ax.clear()
-        ax.set_title("Movements at frame " + str(t))
-        ax.set_xlim(xmin,xmax)
-        ax.set_ylim(ymin,ymax)
-        tuples = tuple([x[k],y[k]] for k in range(len(x)))        
-        scat.set_offsets(tuples)
-            
-        for j in range(len(tuples)):
-            ax.annotate(int(user_id[j]),tuples[j], size = 10)
-            
-        # define colormap and markers
-        # cmap = plt.cm.get_cmap("prism",len(np.unique(df['user_id'])))
-        markers = ['^', 'o', 's','p','d','P']
-        # markers[1]: triangle_up, pedestrians
-        # markers[2]: circle, cyclists
-        # markers[3]: square, vehicles
-        
-        for i,j in enumerate(user_id):
-            ax.scatter(x[i],y[i],s = 50)
-        
-    anim = animation.FuncAnimation(fig, update, frames = len(np.unique(data[:,3])), \
-                            interval = 200, repeat = True)
-    plt.show()
+    dt = 0.3
+    show_animation = True
+    
+    # plotPaths(userInfo, trajsWithId)

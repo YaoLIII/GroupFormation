@@ -16,43 +16,51 @@ import function as F
 import matplotlib.pyplot as plt
 # import visualize_SDD as V 
 
-# read processed data
-sample = 'deathCircle'
-output_dir ='../data/stanford_campus_dataset/processed/'+ sample +'/'
+# # test with SDD dataset/deathcircle
+# sample = 'deathCircle'
+# output_dir ='../data/stanford_campus_dataset/processed/'+ sample +'/'
 
-files = os.listdir(output_dir)
-# test:
-file = files[0]
-avg_info = files[1]
-print('start to deal with '+ file + '...')
+# files = os.listdir(output_dir)
+# # test:
+# file = files[0]
+# avg_info = files[1]
+# print('start to deal with '+ file + '...')
 
-data = pd.read_csv(output_dir+file, delimiter=',')
-avg_info = pd.read_csv(output_dir+avg_info, delimiter=',')
+# data = pd.read_csv(output_dir+file, delimiter=',')
+# avg_info = pd.read_csv(output_dir+avg_info, delimiter=',')
 
-## convert df to numpy array
-# replace type by numbers
-user_type = data.type.unique()
-type_dict = dict(zip(user_type, range(len(user_type))))
-data = data.replace({'type':type_dict})
-# [id, oframe, ox, oy, dframe, dx, dy, avg_v, type]
-data = np.asarray(data.sort_values('oframe'))
+# ## convert df to numpy array
+# # replace type by numbers
+# user_type = data.type.unique()
+# type_dict = dict(zip(user_type, range(len(user_type))))
+# data = data.replace({'type':type_dict})
+# # [id, oframe, ox, oy, dframe, dx, dy, avg_v, type]
+# data = np.asarray(data.sort_values('oframe'))
 
+# test with synthetic data
+path = '../data/synthetic/'
+data = pd.read_csv(path + 'synthetic_mapSize10_userInfo.csv',sep=',')
+data = np.array(data)
 # split data via waitting time or group member numbers
 th_waiting = 50
 th_group = 20
 
 dimension = 2
-openingcost = 100
-numberofiterations = 664
-windowsize = 50
+openingcost = 3
+numberofiterations = 600
+windowsize = 10
 file = 'test'
 
 facils = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_group,th_waiting)
 
 facils_loc = [np.asarray(i)[:,2:4] for i in facils]
 facil_frames = data[:,1][:len(facils)]
-facil_info = [np.c_[facil_frames[i]*np.ones(len(facils_loc[i])).reshape((-1,1)),facils_loc[i]] for i in range(len(facils_loc))]
-facil_info = np.asarray(facil_info)
+
+# facil_info = [np.c_[facil_frames[i]*np.ones(len(facils_loc[i])).reshape((-1,1)),facils_loc[i]] for i in range(len(facils_loc))]
+# facil_info = np.asarray(facil_info)
+
+
+
 # np.save(output_dir + 'facilities_result.npy', facils)
 
 # V.plotResult(data, facils_loc, facil_frames)
