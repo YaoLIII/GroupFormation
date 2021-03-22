@@ -1,3 +1,4 @@
 # ignore dataset
 data/*
-doc/*
+#ignore documentations
+docs/*
