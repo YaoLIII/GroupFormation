@@ -8,8 +8,8 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-from matplotlib.font_manager import FontProperties
+# import matplotlib.animation as animation
+# from matplotlib.font_manager import FontProperties
 
 def plotPaths(userInfo, trajsWithId):
 
@@ -35,7 +35,7 @@ def plotPaths(userInfo, trajsWithId):
         for t in existUserTraj:
             userTrajSoFar.append(t[t[:,3]<=f])
             
-        if show_animation:  # pragma: no cover
+        if show_animation:
             plt.cla()
             plt.scatter(existUser['ox'].tolist(), existUser['oy'].tolist(), 
                         color='g', marker='^')
