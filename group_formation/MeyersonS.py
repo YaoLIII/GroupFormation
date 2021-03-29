@@ -2,6 +2,7 @@ import random
 import math
 import numpy as np
 import time
+# import scipy.spatial.distance.directed_hausdorff as hd
 
 def dist(x,y,dimension):
     distance=0
@@ -20,6 +21,30 @@ def closest_node_dist(node, nodes):
     dist_2 = np.einsum('ij,ij->i', deltas, deltas)
     #print(dist_2)
     return math.sqrt(min(dist_2))
+
+# def OD_similarity(t1, t2):
+#     # compare the simpilarity between 2 trajectory via their OD
+#     # |o1-o2| + |d1-d2|
+#     # t1: o1(ox1,oy1),d1(dx1,dy1), t2: o2(ox2,oy2),d2(dx2,dy2)
+#     o1 = t1[2:4]
+#     d1 = t1[5:7]
+    
+#     o2 = t2[2:4]
+#     d2 = t2[5:7]
+    
+#     # plt.plot(o1[0],o1[1],'ro')
+#     # plt.plot(d1[0],d1[1],'r*')
+#     # plt.plot(o2[0],o2[1],'go')
+#     # plt.plot(d2[0],d2[1],'g*')
+    
+#     d = np.sqrt(sum((o1-o2)**2)) + np.sqrt(sum((d1-d2)**2))
+#     return d
+
+# def closest_node_dist(point, centers):
+#     #print(node, nodes)
+#     distList = [OD_similarity(point,i) for i in centers]
+#     correspId = distList.index(min(distList))
+#     return min(distList),correspId
 
 #If we want to calculate the sum of the actual distances to closest center and not just the assigned one
 def actualcost(data, facilities):
