@@ -23,9 +23,8 @@ def plotPaths(userInfo, trajsWithId, facils_loc, mutation):
     frameRange = [min(oframe),max(dframe)]
     
     mut = np.asarray(mutation)
-    mutation.append(int(max(dframe)))
-    
-    mut = np.asarray(mutation)
+    mut = np.insert(mut,0,0)
+    # mutation.append(int(max(dframe)))
     
     for f in np.arange(frameRange[0],frameRange[1]):
         
