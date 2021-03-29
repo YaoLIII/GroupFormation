@@ -91,14 +91,19 @@ def meyerson(data, dimension, f,facil,overcount):
             #open center at this point
             #print('agurk')
             #facilities = np.append(facilities, point)
-            facilities.append(point)
-            cost = cost + f
+            facilities.append(point) # move from before if to avoid duplicate            
+            cost = cost + f # move from before if to avoid duplicate
             if isin(facil,point):
-                #print('already a facil')
+                # print('already a facil')
+                # print(point)
+                # print(facilities)
+                # facilities.remove(point) # if this point is already in fac, remove duplicate
                 overcount+=1
                 #print(overcount)
             else:
                 numberofcenters += 1
+                # facilities.append(point) # move from before if to avoid duplicate
+                # cost = cost + f # move from before if to avoid duplicate
             
         else:
             cost = cost + nearest
@@ -129,56 +134,25 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_group,th_waiting):
     TotalNumberofCentersOpened=0
     start = time.time()
     
-    # flag = 0
-    # i = 0
+    flag = 0
+    i = 0
+    mutation = []
     
-    # while flag < len(data):
-    #     waiting_period = data[:,1]-data[flag,1]
-    #     if np.where(waiting_period>th_waiting)[0].size >0:
-    #         waiting_bound = np.where(waiting_period>th_waiting)[0][0] #idx: waiting time over th_waiting
-    #         currentdata = data[flag:waiting_bound]
-    #         if len(currentdata) > th_group:
-    #             currentdata = currentdata[:th_group] # reach th_group can start moving
-    #         flag += len(currentdata)
-    #     else:
-    #         currentdata = data[flag:]
-    #         flag += len(currentdata)
-    #     # print(len(currentdata))
-        
-    #     if i-lasttime>howlong:
-    #         lastfacil,lastcost,holder,overcount=meyersonmanytimes(currentdata,dimension,f,timesrecompute,currentfacil,overcount)
-    #         howlong=4*lastcost/f
-    #         TotalNumberofCentersOpened+=holder
-    #         #print(howlong)
-    #         lasttime=i
-    #         currentcost=lastcost
-    #         TotalRecompute+=1
-    #         currentfacil=lastfacil
-    #     else:
-    #         # print(data[i-1],currentfacil)
-    #         currentcost-=closest_node_dist(data[i-1],currentfacil)
-    #         nearest=closest_node_dist(data[i+window-1],currentfacil)
-    #         if nearest<f:
-    #             currentcost=currentcost+nearest
-    #         else:
-    #             currentcost=currentcost+f
-    #             TotalNumberofCentersOpened+=1
-    #             currentfacil.append(data[i+window-1])
-                
-    #     facils.append(currentfacil)   # 这里有问题
-    #     print(len(currentfacil))
-        
-    #     #print(currentcost, costReMey)
-    #     if i%100==0:
-    #          print(i,TotalNumberofCentersOpened,currentcost, time.time()-start,howlong,overcount)
-    #     g.write(str(i)+ " "+str(currentcost)+ " " + str(TotalNumberofCentersOpened) + " "+  str(time.time()-start)+ '\n')
-        
-    #     i = i + 1
-        
-    # return facils
-        
-    for i in range(0,n-window):
-        currentdata=data[i:i+window]
+    while flag < len(data):
+        waiting_period = data[:,1]-data[flag,1]
+        # print(waiting_period)
+        if np.where(waiting_period>th_waiting)[0].size >0:
+            # print(np.where(waiting_period>th_waiting)[0].size)
+            waiting_bound = np.where(waiting_period>th_waiting)[0][0] #idx: waiting time over th_waiting
+            mutation.append(waiting_bound)
+            currentdata = data[flag:waiting_bound]
+            if len(currentdata) > th_group:
+                currentdata = currentdata[:th_group] # reach th_group can start moving
+            flag += len(currentdata)
+        else:
+            currentdata = data[flag:]
+            flag += len(currentdata)
+        # print(len(currentdata))
         
         if i-lasttime>howlong:
             lastfacil,lastcost,holder,overcount=meyersonmanytimes(currentdata,dimension,f,timesrecompute,currentfacil,overcount)
@@ -200,15 +174,50 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_group,th_waiting):
                 TotalNumberofCentersOpened+=1
                 currentfacil.append(data[i+window-1])
                 
-        facils.append(list(currentfacil)) 
+        facils.append(list(currentfacil))
         # print(len(currentfacil))
+        
         #print(currentcost, costReMey)
         if i%100==0:
               print(i,TotalNumberofCentersOpened,currentcost, time.time()-start,howlong,overcount)
         g.write(str(i)+ " "+str(currentcost)+ " " + str(TotalNumberofCentersOpened) + " "+  str(time.time()-start)+ '\n')
         
+        i = i + 1
         
-    return facils
+    return facils,mutation
+        
+    # for i in range(0,n-window):
+    #     currentdata=data[i:i+window]
+        
+    #     if i-lasttime>howlong:
+    #         lastfacil,lastcost,holder,overcount=meyersonmanytimes(currentdata,dimension,f,timesrecompute,currentfacil,overcount)
+    #         howlong=4*lastcost/f
+    #         TotalNumberofCentersOpened+=holder
+    #         #print(howlong)
+    #         lasttime=i
+    #         currentcost=lastcost
+    #         TotalRecompute+=1
+    #         currentfacil=lastfacil
+    #     else:
+    #         # print(data[i-1],currentfacil)
+    #         currentcost-=closest_node_dist(data[i-1],currentfacil)
+    #         nearest=closest_node_dist(data[i+window-1],currentfacil)
+    #         if nearest<f:
+    #             currentcost=currentcost+nearest
+    #         else:
+    #             currentcost=currentcost+f
+    #             TotalNumberofCentersOpened+=1
+    #             currentfacil.append(data[i+window-1])
+                
+    #     facils.append(list(currentfacil)) 
+    #     # print(len(currentfacil))
+    #     #print(currentcost, costReMey)
+    #     if i%100==0:
+    #           print(i,TotalNumberofCentersOpened,currentcost, time.time()-start,howlong,overcount)
+    #     g.write(str(i)+ " "+str(currentcost)+ " " + str(TotalNumberofCentersOpened) + " "+  str(time.time()-start)+ '\n')
+        
+        
+    # return facils
 
 if __name__ == "__main__":
     sample_num = 20

@@ -13,6 +13,7 @@ import os
 import time
 import random
 import function as F
+import MeyersonS as MS
 import matplotlib.pyplot as plt
 # import visualize_SDD as V 
 
@@ -51,10 +52,26 @@ numberofiterations = 600
 windowsize = 10
 file = 'test'
 
-facils = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_group,th_waiting)
 
-facils_loc = [np.asarray(i)[:,2:4] for i in facils]
-facil_frames = data[:,1][:len(facils)]
+
+facils,mutation = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_group,th_waiting)
+# facils_loc = [np.unique((np.asarray(i)[:,2:4]),axis=0) for i in facils]
+
+## test with synthetic dataset but dimention = 3
+# path = '../data/synthetic/'
+# data = pd.read_csv(path + 'synthetic_mapSize10_userInfo.csv',sep=',')
+# data = np.array(data.iloc[:,1:4])
+# # split data via waitting time or group member numbers
+# th_waiting = 50
+# th_group = 20
+
+# dimension = 3
+# openingcost = 3
+# numberofiterations = 600
+# windowsize = 10
+# file = 'test'
+
+# f2 = MS.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file)
 
 # facil_info = [np.c_[facil_frames[i]*np.ones(len(facils_loc[i])).reshape((-1,1)),facils_loc[i]] for i in range(len(facils_loc))]
 # facil_info = np.asarray(facil_info)

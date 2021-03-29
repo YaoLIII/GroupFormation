@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 # import matplotlib.animation as animation
 # from matplotlib.font_manager import FontProperties
 
-def plotPaths(userInfo, trajsWithId):
+def plotPaths(userInfo, trajsWithId, facils_loc, mutation):
 
     ox = userInfo['ox'].tolist()
     oy = userInfo['oy'].tolist()
@@ -21,6 +21,11 @@ def plotPaths(userInfo, trajsWithId):
     dframe = userInfo['dframe'].tolist()
     
     frameRange = [min(oframe),max(dframe)]
+    
+    mut = np.asarray(mutation)
+    mutation.append(int(max(dframe)))
+    
+    mut = np.asarray(mutation)
     
     for f in np.arange(frameRange[0],frameRange[1]):
         
@@ -35,12 +40,14 @@ def plotPaths(userInfo, trajsWithId):
         for t in existUserTraj:
             userTrajSoFar.append(t[t[:,3]<=f])
             
+
+        facils = facils_loc[np.where(np.asarray(mut)<=f)[0][-1]]
+            
         if show_animation:
             plt.cla()
             plt.scatter(existUser['ox'].tolist(), existUser['oy'].tolist(), 
                         color='g', marker='^')
-            # plt.scatter(existUser['dx'].tolist(), existUser['dy'].tolist(), 
-            #             color='r', marker='X')
+            plt.scatter(facils[:,0], facils[:,1], color='y', marker='o', s= 30)
             
             for subt in userTrajSoFar:
                 plt.plot(subt[:,1], subt[:,2], 'b--')
@@ -66,4 +73,4 @@ if __name__ == "__main__":
     dt = 0.3
     show_animation = True
     
-    plotPaths(userInfo, trajsWithId)
+    plotPaths(userInfo, trajsWithId, facils_loc, mutation)
