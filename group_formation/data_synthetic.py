@@ -86,7 +86,7 @@ def genInput(trajsWithId):
         idx = t[0,0]
         oframe = t[0,3]
         dframe = t[-1,3]
-        av = 1 #default value
+        av = (4 - 0.5) * np.random.random_sample() + 0.5 #default value
         ty = 0 #default value
         userInfo.append([idx,oframe,ox,oy,dframe,dx,dy,av,ty])
         
