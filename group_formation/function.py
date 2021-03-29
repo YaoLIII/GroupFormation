@@ -50,7 +50,8 @@ def OD_similarity(t1, t2):
 def closest_node_dist(point, centers):
     #print(node, nodes)
     distList = [OD_similarity(point,i) for i in centers]
-    return min(distList)
+    correspId = distList.index(min(distList))
+    return min(distList),correspId
 
 def updateCenters(point, centers, f):
     distList = [OD_similarity(point,i) for i in centers]
@@ -66,11 +67,6 @@ def updateCenters(point, centers, f):
 
 def meyerson(data, dimension, f,facil,overcount):
     data= np.random.permutation(data)
-    #print(data[0:10])
-    #setfacil = set(facil)
-    #print('agurk')
-    #print(setfacil)
-    #print(type(setfacil))
     facilities= []
     cost=0
     counter=0
@@ -82,7 +78,7 @@ def meyerson(data, dimension, f,facil,overcount):
             #print(counter)
         #find nearest facility
         if numberofcenters>0:
-            nearest = closest_node_dist(point,facilities)
+            nearest,_ = closest_node_dist(point,facilities)
             #print(nearest)
         else:
             nearest = f+1
@@ -165,14 +161,20 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_group,th_waiting):
             currentfacil=lastfacil
         else:
             # print(data[i-1],currentfacil)
-            currentcost-=closest_node_dist(data[i-1],currentfacil)
-            nearest=closest_node_dist(data[i+window-1],currentfacil)
+            currentcost-=closest_node_dist(data[i-1],currentfacil)[0]
+            nearest,_=closest_node_dist(data[i+window-1],currentfacil)
             if nearest<f:
                 currentcost=currentcost+nearest
             else:
                 currentcost=currentcost+f
                 TotalNumberofCentersOpened+=1
                 currentfacil.append(data[i+window-1])
+                
+        # if i%100==0:
+        #       print(i,TotalNumberofCentersOpened,currentcost, time.time()-start,howlong,overcount)
+        # g.write(str(i)+ " "+str(currentcost)+ " " + str(TotalNumberofCentersOpened) + " "+  str(time.time()-start)+ '\n')
+        
+        # i = i + 1
                 
         facils.append(list(currentfacil))
         # print(len(currentfacil))
@@ -185,41 +187,84 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_group,th_waiting):
         i = i + 1
         
     return facils,mutation
+
+# def DFL_():        
+#     for i in range(0,n-window):
+#         currentdata=data[i:i+window]
         
-    # for i in range(0,n-window):
-    #     currentdata=data[i:i+window]
-        
-    #     if i-lasttime>howlong:
-    #         lastfacil,lastcost,holder,overcount=meyersonmanytimes(currentdata,dimension,f,timesrecompute,currentfacil,overcount)
-    #         howlong=4*lastcost/f
-    #         TotalNumberofCentersOpened+=holder
-    #         #print(howlong)
-    #         lasttime=i
-    #         currentcost=lastcost
-    #         TotalRecompute+=1
-    #         currentfacil=lastfacil
-    #     else:
-    #         # print(data[i-1],currentfacil)
-    #         currentcost-=closest_node_dist(data[i-1],currentfacil)
-    #         nearest=closest_node_dist(data[i+window-1],currentfacil)
-    #         if nearest<f:
-    #             currentcost=currentcost+nearest
-    #         else:
-    #             currentcost=currentcost+f
-    #             TotalNumberofCentersOpened+=1
-    #             currentfacil.append(data[i+window-1])
+#         if i-lasttime>howlong:
+#             lastfacil,lastcost,holder,overcount=meyersonmanytimes(currentdata,dimension,f,timesrecompute,currentfacil,overcount)
+#             howlong=4*lastcost/f
+#             TotalNumberofCentersOpened+=holder
+#             #print(howlong)
+#             lasttime=i
+#             currentcost=lastcost
+#             TotalRecompute+=1
+#             currentfacil=lastfacil
+#         else:
+#             # print(data[i-1],currentfacil)
+#             currentcost-=closest_node_dist(data[i-1],currentfacil)
+#             nearest=closest_node_dist(data[i+window-1],currentfacil)
+#             if nearest<f:
+#                 currentcost=currentcost+nearest
+#             else:
+#                 currentcost=currentcost+f
+#                 TotalNumberofCentersOpened+=1
+#                 currentfacil.append(data[i+window-1])
                 
-    #     facils.append(list(currentfacil)) 
-    #     # print(len(currentfacil))
-    #     #print(currentcost, costReMey)
-    #     if i%100==0:
-    #           print(i,TotalNumberofCentersOpened,currentcost, time.time()-start,howlong,overcount)
-    #     g.write(str(i)+ " "+str(currentcost)+ " " + str(TotalNumberofCentersOpened) + " "+  str(time.time()-start)+ '\n')
+#         facils.append(list(currentfacil)) 
+#         # print(len(currentfacil))
+#         #print(currentcost, costReMey)
+#         if i%100==0:
+#               print(i,TotalNumberofCentersOpened,currentcost, time.time()-start,howlong,overcount)
+#         g.write(str(i)+ " "+str(currentcost)+ " " + str(TotalNumberofCentersOpened) + " "+  str(time.time()-start)+ '\n')
         
         
-    # return facils
+#     return facils
 
 if __name__ == "__main__":
-    sample_num = 20
-    f = 100
+    
+    # test Meyerson with synthetic data
+    path = '../data/synthetic/'
+    userInfo = pd.read_csv(path + 'synthetic_mapSize10_userInfo.csv', sep=',')
+    trajsWithId = np.load(path + 'synthetic_mapSize10_trajsWithId.npy')
+    
+    num = 300
+    
+    # # plot sample users Origins
+    # x = userInfo['ox'].iloc[0:num].tolist()
+    # y = userInfo['oy'].iloc[0:num].tolist()
+    # plt.plot(x,y,'.')
+    
+    # extract sample users
+    data = userInfo.iloc[0:num,:].to_numpy()
+    # facilities,cost,numberofcenters,overcount = meyerson(data,2,20,[],0)   
+    
+    '''check multi Meyerson fun with sample data''' 
+    facilities,cost,numberofcenters,overcount = meyersonmanytimes(data,2, 6, 5,[],0)
+    
+    # extract users which has the same center
+    centers = []
+    for pt in data:
+        _,centerIdx = closest_node_dist(pt, facilities)
+        centers.append(centerIdx)
+     
+    group = []
+    plt.figure()   
+    for c in np.unique(centers):
+        # users belongs to same group
+        groupId = np.argwhere(centers==c).ravel()
+        group.append(groupId)
+        for idx in groupId:
+            # extract user trajectory
+            user = trajsWithId[np.argwhere(trajsWithId[:,0]==idx).ravel()]
+            plt.xlim(-1, 11)
+            plt.ylim(-1, 11)
+            plt.plot(user[:,1],user[:,2],'*-')
+        plt.pause(0.5)
+        plt.cla()
+        
+    
+    # f_loc = np.asarray(facilities)[:,2:4]
+    # plt.plot(f_loc[:,0],f_loc[:,1],'*')
 

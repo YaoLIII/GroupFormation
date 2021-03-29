@@ -47,15 +47,13 @@ th_waiting = 50
 th_group = 20
 
 dimension = 2
-openingcost = 3
+openingcost = 8
 numberofiterations = 600
 windowsize = 10
 file = 'test'
 
-
-
 facils,mutation = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_group,th_waiting)
-# facils_loc = [np.unique((np.asarray(i)[:,2:4]),axis=0) for i in facils]
+facils_loc = [np.unique((np.asarray(i)[:,2:4]),axis=0) for i in facils]
 
 ## test with synthetic dataset but dimention = 3
 # path = '../data/synthetic/'
