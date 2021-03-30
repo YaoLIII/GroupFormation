@@ -44,94 +44,53 @@ path = '../data/synthetic/'
 data = pd.read_csv(path + 'synthetic_mapSize10_userInfo.csv',sep=',')
 data = np.array(data)
 # split data via waitting time or group member numbers
-th_waiting = 5
+th_waiting = 10
 th_group = 15
 
 dimension = 2
 openingcost = 4
 numberofiterations = len(data)
-windowsize = 20
+windowsize = 50
 file = 'test'
 
 facils,mutation = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_group,th_waiting)
 facils_loc = [np.unique((np.asarray(i)[:,2:4]),axis=0) for i in facils]
 
-path = '../data/synthetic/'
-userInfo = pd.read_csv(path + 'synthetic_mapSize10_userInfo.csv', sep=',')
-trajsWithId = np.load(path + 'synthetic_mapSize10_trajsWithId.npy')
+# path = '../data/synthetic/'
+# userInfo = pd.read_csv(path + 'synthetic_mapSize10_userInfo.csv', sep=',')
+# trajsWithId = np.load(path + 'synthetic_mapSize10_trajsWithId.npy')
 
-ox = userInfo['ox'].tolist()
-oy = userInfo['oy'].tolist()
-# dx = userInfo['dx'].tolist()
-# dy = userInfo['dy'].tolist()
-oframe = userInfo['oframe'].tolist()
-dframe = userInfo['dframe'].tolist()
+# ox = userInfo['ox'].tolist()
+# oy = userInfo['oy'].tolist()
+# # dx = userInfo['dx'].tolist()
+# # dy = userInfo['dy'].tolist()
+# oframe = userInfo['oframe'].tolist()
+# dframe = userInfo['dframe'].tolist()
 
-frameRange = [min(oframe),max(dframe)]
+# frameRange = [min(oframe),max(dframe)]
 
-mut = np.asarray(mutation)
-mut = np.insert(mut,0,0)
-mut = np.insert(mut,len(mut),max(dframe))
+# mut = np.asarray(mutation)
+# mut = np.insert(mut,0,0)
+# mut = np.insert(mut,len(mut),max(dframe))
 
-# x = max(map(len,facils_loc))
-# ys = [i+x+(i*x)**2 for i in range(x)]
+# user_center_perPeriod = []
+# for period in range(len(facils)):
+#     centers = facils[period]
+#     existUsers = userInfo[(userInfo['oframe']>=mut[period]) & (userInfo['oframe']<mut[period+1])]
+#     # print(len(existUsers))
+#     centerIds = []
+#     for user in np.asarray(existUsers):
+#         _,centerId = F.closest_node_dist(user, centers)
+#         centerIds.append((user[0],centers[centerId][0])) #(user_id,its_center)
+#         # centerIds.append((user[0], centerId)) #(user_id,its_center_in current period)
+#     user_center_perPeriod.append(centerIds)
 
-# colors = cm.rainbow(np.linspace(0, 1, len(ys)))
-# s_color = np.random.permutation(colors)
-
-userPerPeriod = []
-for period in range(len(facils)):
-    centers = facils[period]
-    existUsers = userInfo[(userInfo['oframe']>=mut[period]) & (userInfo['oframe']<mut[period+1])]
-    print(len(existUsers))
-    centerIds = []
-    for user in np.asarray(existUsers):
-        _,centerId = F.closest_node_dist(user, centers)
-        centerIds.append((user[0],centers[centerId][0])) #(user_id,its_center)
-    userPerPeriod.append(centerIds)
-
-for f in np.arange(frameRange[0],frameRange[1]):
+# dt = 0.3
+# show_animation = True
     
-    existUser = userInfo[(userInfo['oframe']<=f) & (userInfo['dframe']>=f)]
-    existUserId = existUser['track_id']
-    existUserId = list(map(int,existUserId.tolist()))
-    
-    allTrajs = np.vstack(trajsWithId)
-    existUserTraj = [allTrajs[allTrajs[:,0]==i] for i in existUserId]
-    
-    userTrajSoFar = []
-    for t in existUserTraj:
-        userTrajSoFar.append(t[t[:,3]<=f])            
+# VS.plotPaths(userInfo, trajsWithId, facils_loc, mutation, user_center_perPeriod, dt, show_animation)
 
-    f_loc = facils_loc[np.where(np.asarray(mut)<=f)[0][-1]]
-
-# extract users which has the same center
-centers = []
-for pt in data:
-    _,centerIdx = closest_node_dist(pt, facilities)
-    centers.append(centerIdx)
- 
-group = []
-plt.figure()   
-for c in np.unique(centers):
-    # users belongs to same group
-    groupId = np.argwhere(centers==c).ravel()
-    group.append(groupId)
-    for idx in groupId:
-        # extract user trajectory
-        user = trajsWithId[np.argwhere(trajsWithId[:,0]==idx).ravel()]
-        plt.xlim(-1, 11)
-        plt.ylim(-1, 11)
-        plt.plot(user[:,1],user[:,2],'*-')
-    plt.pause(0.5)
-    plt.cla()
-
-dt = 0.3
-show_animation = True
-    
-VS.plotPaths(userInfo, trajsWithId, facils_loc, mutation, dt, show_animation)
-
-# # test with synthetic dataset but dimention = 6 #[of,ox,oy,dx,dy,av]
+# ''' test with synthetic dataset but dimention = 6 #[of,ox,oy,dx,dy,av]'''
 # path = '../data/synthetic/'
 # data = pd.read_csv(path + 'synthetic_mapSize10_userInfo.csv',sep=',')
 # data = np.array(data.iloc[:,[1,2,3,5,6,7]]) #[of,ox,oy,dx,dy,av]

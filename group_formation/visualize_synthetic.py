@@ -12,7 +12,7 @@ import matplotlib.cm as cm
 # import matplotlib.animation as animation
 # from matplotlib.font_manager import FontProperties
 
-def plotPaths(userInfo, trajsWithId, facils_loc, mutation, dt, show_animation):
+def plotPaths(userInfo, trajsWithId, facils_loc, mutation, user_center_perPeriod, dt, show_animation):
 
     ox = userInfo['ox'].tolist()
     oy = userInfo['oy'].tolist()
@@ -26,11 +26,12 @@ def plotPaths(userInfo, trajsWithId, facils_loc, mutation, dt, show_animation):
     mut = np.asarray(mutation)
     mut = np.insert(mut,0,0)
 
-    x = max(map(len,facils_loc))
+    x = int(max(map(len,facils_loc))) #use relatiev center number - center per period
+    # x = len(userInfo) # absolute center number: id-color
     ys = [i+x+(i*x)**2 for i in range(x)]
     
     colors = cm.rainbow(np.linspace(0, 1, len(ys)))
-    s_color = np.random.permutation(colors)
+    colors = np.random.permutation(colors)
     
     for f in np.arange(frameRange[0],frameRange[1]):
         
@@ -44,9 +45,16 @@ def plotPaths(userInfo, trajsWithId, facils_loc, mutation, dt, show_animation):
         userTrajSoFar = []
         for t in existUserTraj:
             userTrajSoFar.append(t[t[:,3]<=f])            
-
-        f_loc = facils_loc[np.where(np.asarray(mut)<=f)[0][-1]]
-        print(len(f_loc))
+            
+        existPeriod = np.where(np.asarray(mut)<=f)[0]
+        f_loc = facils_loc[existPeriod[-1]]
+        periods = []
+        for p in existPeriod:
+            for j in user_center_perPeriod[p]:
+                periods.append(j)
+        # periods = [user_center_perPeriod[i] for i in existPeriod]
+        c_dict = dict(periods)
+        # print(len(f_loc))
             
         if show_animation:
             plt.cla()
@@ -55,7 +63,9 @@ def plotPaths(userInfo, trajsWithId, facils_loc, mutation, dt, show_animation):
             plt.scatter(f_loc[:,0], f_loc[:,1], color='y', marker='o', s= 30)
             
             for subt in userTrajSoFar:
-                plt.plot(subt[:,1], subt[:,2], 'b--')
+                print(subt[0,0])
+                print(c_dict[subt[0,0]])
+                plt.plot(subt[:,1], subt[:,2], '--', color = colors[int(c_dict[subt[0,0]])])
                 plt.plot(subt[-1,1], subt[-1,2], color='r', marker='X')
                 plt.annotate(str(int(subt[0,0])),
                              (subt[-1,1], subt[-1,2]),
