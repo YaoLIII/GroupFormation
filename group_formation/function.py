@@ -39,11 +39,6 @@ def OD_similarity(t1, t2):
     o2 = t2[2:4]
     d2 = t2[5:7]
     
-    # plt.plot(o1[0],o1[1],'ro')
-    # plt.plot(d1[0],d1[1],'r*')
-    # plt.plot(o2[0],o2[1],'go')
-    # plt.plot(d2[0],d2[1],'g*')
-    
     d = np.sqrt(sum((o1-o2)**2)) + np.sqrt(sum((d1-d2)**2))
     return d
 
@@ -52,18 +47,6 @@ def closest_node_dist(point, centers):
     distList = [OD_similarity(point,i) for i in centers]
     correspId = distList.index(min(distList))
     return min(distList),correspId
-
-def updateCenters(point, centers, f):
-    distList = [OD_similarity(point,i) for i in centers]
-    closest_center = centers[np.argwhere(distList==min(distList)).item()]
-    if np.random.random_sample()*2*f < min(distList):
-        centers = np.r_[centers,point.reshape((1,-1))]
-    # else:
-    #         #send this point to the nearest center point
-    #     centers = centers
-    
-    # for i in range(n*math.log(n)):
-    return centers
 
 def meyerson(data, dimension, f,facil,overcount):
     data= np.random.permutation(data)
@@ -141,8 +124,10 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_group,th_waiting):
             # print(np.where(waiting_period>th_waiting)[0].size)
             waiting_bound = np.where(waiting_period>th_waiting)[0][0] #idx: waiting time over th_waiting
             mutation.append(waiting_bound)
+            print('reach the maximum waitting time!')
             currentdata = data[flag:waiting_bound]
             if len(currentdata) > th_group:
+                print('reach the maximum person num!')
                 currentdata = currentdata[:th_group] # reach th_group can start moving
             flag += len(currentdata)
         else:

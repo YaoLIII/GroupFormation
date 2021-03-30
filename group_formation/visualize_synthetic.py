@@ -8,15 +8,16 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 # import matplotlib.animation as animation
 # from matplotlib.font_manager import FontProperties
 
-def plotPaths(userInfo, trajsWithId, facils_loc, mutation):
+def plotPaths(userInfo, trajsWithId, facils_loc, mutation, dt, show_animation):
 
     ox = userInfo['ox'].tolist()
     oy = userInfo['oy'].tolist()
-    dx = userInfo['dx'].tolist()
-    dy = userInfo['dy'].tolist()
+    # dx = userInfo['dx'].tolist()
+    # dy = userInfo['dy'].tolist()
     oframe = userInfo['oframe'].tolist()
     dframe = userInfo['dframe'].tolist()
     
@@ -24,7 +25,12 @@ def plotPaths(userInfo, trajsWithId, facils_loc, mutation):
     
     mut = np.asarray(mutation)
     mut = np.insert(mut,0,0)
-    # mutation.append(int(max(dframe)))
+
+    x = max(map(len,facils_loc))
+    ys = [i+x+(i*x)**2 for i in range(x)]
+    
+    colors = cm.rainbow(np.linspace(0, 1, len(ys)))
+    s_color = np.random.permutation(colors)
     
     for f in np.arange(frameRange[0],frameRange[1]):
         
@@ -37,16 +43,16 @@ def plotPaths(userInfo, trajsWithId, facils_loc, mutation):
         
         userTrajSoFar = []
         for t in existUserTraj:
-            userTrajSoFar.append(t[t[:,3]<=f])
-            
+            userTrajSoFar.append(t[t[:,3]<=f])            
 
-        facils = facils_loc[np.where(np.asarray(mut)<=f)[0][-1]]
+        f_loc = facils_loc[np.where(np.asarray(mut)<=f)[0][-1]]
+        print(len(f_loc))
             
         if show_animation:
             plt.cla()
             plt.scatter(existUser['ox'].tolist(), existUser['oy'].tolist(), 
                         color='g', marker='^')
-            plt.scatter(facils[:,0], facils[:,1], color='y', marker='o', s= 30)
+            plt.scatter(f_loc[:,0], f_loc[:,1], color='y', marker='o', s= 30)
             
             for subt in userTrajSoFar:
                 plt.plot(subt[:,1], subt[:,2], 'b--')
@@ -72,4 +78,4 @@ if __name__ == "__main__":
     dt = 0.3
     show_animation = True
     
-    plotPaths(userInfo, trajsWithId, facils_loc, mutation)
+    plotPaths(userInfo, trajsWithId, facils_loc, mutation, dt, show_animation)

@@ -127,6 +127,7 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename):
     for i in range(0,n-window):
         currentdata=data[i:i+window]
         if i-lasttime>howlong:
+            # print('hej')
             lastfacil,lastcost,holder,overcount=meyersonmanytimes(currentdata,dimension,f,timesrecompute,currentfacil,overcount)
             howlong=4*lastcost/f
             TotalNumberofCentersOpened+=holder
