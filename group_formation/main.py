@@ -44,46 +44,47 @@ path = '../data/synthetic/'
 data = pd.read_csv(path + 'synthetic_mapSize10_userInfo.csv',sep=',')
 data = np.array(data)
 # split data via waitting time or group member numbers
-th_waiting = 10
+th_waiting = 40
 th_group = 15
 
+# 可以根据 mapSize*8 /(opencost/2) 算出大概同时存在最多fac数目
 dimension = 2
-openingcost = 4
+openingcost = 10
 numberofiterations = len(data)
-windowsize = 50
+windowsize = 30
 file = 'test'
 
 facils,mutation = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_group,th_waiting)
 facils_loc = [np.unique((np.asarray(i)[:,2:4]),axis=0) for i in facils]
 
-# path = '../data/synthetic/'
-# userInfo = pd.read_csv(path + 'synthetic_mapSize10_userInfo.csv', sep=',')
-# trajsWithId = np.load(path + 'synthetic_mapSize10_trajsWithId.npy')
+path = '../data/synthetic/'
+userInfo = pd.read_csv(path + 'synthetic_mapSize10_userInfo.csv', sep=',')
+trajsWithId = np.load(path + 'synthetic_mapSize10_trajsWithId.npy')
 
-# ox = userInfo['ox'].tolist()
-# oy = userInfo['oy'].tolist()
-# # dx = userInfo['dx'].tolist()
-# # dy = userInfo['dy'].tolist()
-# oframe = userInfo['oframe'].tolist()
-# dframe = userInfo['dframe'].tolist()
+ox = userInfo['ox'].tolist()
+oy = userInfo['oy'].tolist()
+# dx = userInfo['dx'].tolist()
+# dy = userInfo['dy'].tolist()
+oframe = userInfo['oframe'].tolist()
+dframe = userInfo['dframe'].tolist()
 
-# frameRange = [min(oframe),max(dframe)]
+frameRange = [min(oframe),max(dframe)]
 
-# mut = np.asarray(mutation)
+mut = np.asarray(mutation)
 # mut = np.insert(mut,0,0)
-# mut = np.insert(mut,len(mut),max(dframe))
+mut = np.insert(mut,len(mut),max(dframe))
 
-# user_center_perPeriod = []
-# for period in range(len(facils)):
-#     centers = facils[period]
-#     existUsers = userInfo[(userInfo['oframe']>=mut[period]) & (userInfo['oframe']<mut[period+1])]
-#     # print(len(existUsers))
-#     centerIds = []
-#     for user in np.asarray(existUsers):
-#         _,centerId = F.closest_node_dist(user, centers)
-#         centerIds.append((user[0],centers[centerId][0])) #(user_id,its_center)
-#         # centerIds.append((user[0], centerId)) #(user_id,its_center_in current period)
-#     user_center_perPeriod.append(centerIds)
+user_center_perPeriod = []
+for period in range(len(facils)):
+    centers = facils[period]
+    existUsers = userInfo[(userInfo['oframe']>=mut[period]) & (userInfo['oframe']<mut[period+1])]
+    # print(len(existUsers))
+    centerIds = []
+    for user in np.asarray(existUsers):
+        _,centerId = F.closest_node_dist(user, centers)
+        centerIds.append((user[0],centers[centerId][0])) #(user_id,its_center)
+        # centerIds.append((user[0], centerId)) #(user_id,its_center_in current period)
+    user_center_perPeriod.append(centerIds)
 
 # dt = 0.3
 # show_animation = True

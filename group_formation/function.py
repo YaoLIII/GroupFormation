@@ -124,16 +124,15 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_group,th_waiting):
     while upperbound < len(data):
         delta_t = data[upperbound,1] - data[lowerbound,1] #enter one point per step
         if delta_t > th_waiting: # waiting time exceed th_waiting
-            print('reach the maximum waiting time!')
+            # print('reach the maximum waiting time!')
             waiting_period = data[:,1] - data[lowerbound,1] 
             newbound = np.where(waiting_period>th_waiting)[0][0] # idx: where exceed th_waiting
             upperbound = newbound
-            currentdata = data[lowerbound:upperbound]                        
-        else:
-            currentdata=data[lowerbound:upperbound]
-        
-        if i-lasttime>howlong:
-            print('recompute cause waiting time')
+            currentdata = data[lowerbound:upperbound]
+            
+            print('recompute because exceed waiting time')
+            mutation.append(data[lowerbound,1])
+            
             lastfacil,lastcost,holder,overcount=meyersonmanytimes(currentdata,dimension,f,timesrecompute,currentfacil,overcount)
             howlong=4*lastcost/f
             TotalNumberofCentersOpened+=holder
@@ -142,21 +141,42 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_group,th_waiting):
             currentcost=lastcost
             TotalRecompute+=1
             currentfacil=lastfacil
-            
+            lowerbound = upperbound
+            upperbound = upperbound + window
+            i += 1
+                      
         else:
-            print('update')
-            currentcost-=closest_node_dist(data[lowerbound-1],currentfacil)[0]
-            nearest,_=closest_node_dist(data[upperbound],currentfacil) # or ub+1?
-            if nearest<f:
-                currentcost=currentcost+nearest
-            else:
-                currentcost=currentcost+f
-                TotalNumberofCentersOpened+=1
-                currentfacil.append(data[upperbound])
+            currentdata=data[lowerbound:upperbound]        
+            if i-lasttime>howlong:
+                print('recompute because reach cost update criteria')
+                mutation.append(data[lowerbound,1])
                 
-        i += 1
-        upperbound += 1
-        lowerbound += 1
+                lastfacil,lastcost,holder,overcount=meyersonmanytimes(currentdata,dimension,f,timesrecompute,currentfacil,overcount)
+                howlong=4*lastcost/f
+                TotalNumberofCentersOpened+=holder
+                #print(howlong)
+                lasttime=i
+                currentcost=lastcost
+                TotalRecompute+=1
+                currentfacil=lastfacil
+                
+            else:                
+                mutation.append(data[lowerbound,1])
+                
+                currentcost-=closest_node_dist(data[lowerbound-1],currentfacil)[0]
+                nearest,_=closest_node_dist(data[upperbound],currentfacil) # or ub+1?
+                if nearest<f:
+                    print('update')
+                    currentcost=currentcost+nearest
+                else:
+                    print('too close to open new facil')
+                    currentcost=currentcost+f
+                    TotalNumberofCentersOpened+=1
+                    currentfacil.append(data[upperbound])
+                
+            i += 1
+            upperbound += 1
+            lowerbound += 1
         
         facils.append(list(currentfacil))
         #print(currentcost, costReMey)

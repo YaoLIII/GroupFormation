@@ -103,13 +103,13 @@ if __name__ == "__main__":
     mapSize = 10
     trajNum = 600
     firstFrame = 0
-    trajs = genTrajSet(mapSize,trajNum,firstFrame) #list of [x,y,t]
+    # trajs = genTrajSet(mapSize,trajNum,firstFrame) #list of [x,y,t]
     
-    # # multi traj sets examples - for discrete group
-    # t1 = genTrajSet(mapSize,10,100)
-    # t2 = genTrajSet(mapSize,10,300)
-    # t3 = genTrajSet(mapSize,10,200)
-    # trajs = t1 + t2 +t3
+    # multi traj sets examples - for discrete group
+    t1 = genTrajSet(mapSize,100,100)
+    t2 = genTrajSet(mapSize,200,300)
+    t3 = genTrajSet(mapSize,300,700)
+    trajs = t1 + t2 +t3
     
     trajsWithId = [ np.c_[ (np.ones((len(trajs[i]),1))*i), trajs[i] ] for i in range(len(trajs))]
     userInfo = genInput(trajsWithId)
