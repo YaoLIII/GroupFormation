@@ -12,6 +12,50 @@ import matplotlib.cm as cm
 # import matplotlib.animation as animation
 # from matplotlib.font_manager import FontProperties
 
+def plotData(userInfo, trajsWithId, dt, show_animation):
+
+    ox = userInfo['ox'].tolist()
+    oy = userInfo['oy'].tolist()
+
+    oframe = userInfo['oframe'].tolist()
+    dframe = userInfo['dframe'].tolist()
+    
+    frameRange = [min(oframe),max(dframe)]
+    
+    for f in np.arange(frameRange[0],frameRange[1]):
+        
+        existUser = userInfo[(userInfo['oframe']<=f) & (userInfo['dframe']>=f)]
+        existUserId = existUser['track_id']
+        existUserId = list(map(int,existUserId.tolist()))
+        
+        allTrajs = np.vstack(trajsWithId)
+        existUserTraj = [allTrajs[allTrajs[:,0]==i] for i in existUserId]
+        
+        userTrajSoFar = []
+        for t in existUserTraj:
+            userTrajSoFar.append(t[t[:,3]<=f])            
+            
+        if show_animation:
+            plt.cla()
+            plt.scatter(existUser['ox'].tolist(), existUser['oy'].tolist(), 
+                        color='g', marker='^')
+            
+            for subt in userTrajSoFar:
+                # print(subt[0,0])
+                plt.plot(subt[:,1], subt[:,2], 'b--')
+                plt.plot(subt[-1,1], subt[-1,2], color='r', marker='X')
+                plt.annotate(str(int(subt[0,0])),
+                             (subt[-1,1], subt[-1,2]),
+                             textcoords="offset points",
+                             xytext=(0,5),
+                             ha='right')
+        
+            plt.xlim(min(ox)-2, max(ox)+2)
+            plt.ylim(min(oy)-2, max(oy)+2)
+            plt.title( "Before grouping - Movements at frame " + str(int(f)) )
+        
+            plt.pause(dt)
+            
 def plotPaths(userInfo, trajsWithId, facils_loc, mutation, user_center_perPeriod, dt, show_animation):
 
     ox = userInfo['ox'].tolist()
@@ -88,4 +132,4 @@ if __name__ == "__main__":
     dt = 0.3
     show_animation = True
     
-    plotPaths(userInfo, trajsWithId, facils_loc, mutation, dt, show_animation)
+    plotData(userInfo, trajsWithId, dt, show_animation)
