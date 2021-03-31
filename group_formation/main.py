@@ -42,7 +42,8 @@ import visualize_synthetic as VS
 # test with synthetic data
 path = '../data/synthetic/'
 data = pd.read_csv(path + 'synthetic_mapSize10_userInfo.csv',sep=',')
-data = np.array(data)
+trajsWithId = np.load(path + 'synthetic_mapSize10_trajsWithId.npy')
+data = np.array(data.sort_values(by=['oframe']))
 # split data via waitting time or group member numbers
 th_waiting = 40
 th_group = 15
@@ -57,9 +58,7 @@ file = 'test'
 facils,mutation = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_group,th_waiting)
 facils_loc = [np.unique((np.asarray(i)[:,2:4]),axis=0) for i in facils]
 
-path = '../data/synthetic/'
 userInfo = pd.read_csv(path + 'synthetic_mapSize10_userInfo.csv', sep=',')
-trajsWithId = np.load(path + 'synthetic_mapSize10_trajsWithId.npy')
 
 ox = userInfo['ox'].tolist()
 oy = userInfo['oy'].tolist()
@@ -90,6 +89,7 @@ for period in range(len(facils)):
 # show_animation = True
     
 # VS.plotPaths(userInfo, trajsWithId, facils_loc, mutation, user_center_perPeriod, dt, show_animation)
+
 
 # ''' test with synthetic dataset but dimention = 6 #[of,ox,oy,dx,dy,av]'''
 # path = '../data/synthetic/'

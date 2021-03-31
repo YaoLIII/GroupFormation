@@ -1,64 +1,96 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-[aim] 
-    generate synthetic data with [track_id ot ox oy dt dx dy av(1) type(1)]
-[continuity] 
-    - genTrajSet() are continuous in time, i.e. after each frame add one more 
-        traj to scene
-    - for distinct trajectories, generate then independently [firstFrame], 
-        then combine all trajSet, finally add idx
 
-
-@author: yaoli
 """
-import os
-import numpy as np
-import pandas as pd
+
+Move to specified pose
+
+Author: Daniel Ingram (daniel-s-ingram)
+        Atsushi Sakai(@Atsushi_twi)
+
+P. I. Corke, "Robotics, Vision & Control", Springer 2017, ISBN 978-3-319-54413-7
+
+"""
+
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-from matplotlib.font_manager import FontProperties
+import numpy as np
+from random import random
+import pandas as pd
+import os
 
+# simulation parameters
+Kp_rho = 9
+Kp_alpha = 15
+Kp_beta = -3
+dt = 0.01
+    
 def genSingleTraj(mapSize):
     
-    top = np.asarray([np.random.randint(mapSize), mapSize])
-    bottom = np.asarray([np.random.randint(mapSize), 0])
-    left = np.asarray([0, np.random.randint(mapSize)])
-    right = np.asarray([mapSize, np.random.randint(mapSize)])
+    top = np.asarray([mapSize*random(), mapSize])
+    bottom = np.asarray([mapSize*random(), 0])
+    left = np.asarray([0, mapSize*random()])
+    right = np.asarray([mapSize, mapSize*random()])
     
     start, end = np.random.permutation(np.asarray([top,bottom, left, right]))[0:2]
-    # print(start)
-    # print(end)
     
-    path = []
-    
-    # waypoints in x direction
-    if start[0] > end[0]:
-        diff = start[0] - end[0]
-        path = path + [ [i,start[1]] for i in range(end[0],end[0]+diff)[::-1] ]
-    elif start[0] < end[0]:
-        diff = end[0] - start[0]
-        path = path + [ [i,start[1]] for i in range(start[0],start[0]+diff+1) ]
+    x_start = start[0]
+    y_start = start[1]
+    if x_start == 0 and y_start != 0: # come from left
+        theta_start = 0
+    elif x_start != 0 and y_start == mapSize: # come from top
+        theta_start = -0.5 * np.pi
+    elif x_start != 0 and y_start == 0: # come from bottom
+        theta_start = 0.5 * np.pi
+    elif x_start == mapSize and y_start != 0: # come from right
+        theta_start = np.pi
         
-    # waypoints in y direction
-    if start[1] > end[1]:
-        diff = start[1] - end[1] 
-        path = path + [ [end[0],i] for i in range(end[1],end[1]+diff)[::-1] ]
-    elif start[1] < end[1]:
-        diff = end[1] - start[1] 
-        path = path + [ [end[0],i] for i in range(start[1],start[1]+diff+1) ]
+    x_goal = end[0]
+    y_goal = end[1]
+    if x_goal == 0 and y_goal != 0: # go to left
+        theta_goal = np.pi
+    elif x_goal != 0 and y_goal == mapSize: # go to top
+        theta_goal = 0.5 * np.pi
+    elif x_goal != 0 and y_goal == 0: # go to bottom
+        theta_goal = -0.5 * np.pi
+    elif x_goal == mapSize and y_goal != 0: # go to right
+        theta_goal = 0
+        
+    x = x_start
+    y = y_start
+    theta = theta_start
+
+    x_diff = x_goal - x
+    y_diff = y_goal - y
+
+    x_traj, y_traj = [], []
+
+    rho = np.hypot(x_diff, y_diff)
     
-    # insert start and end points
-    path.insert(0,start)
-    path.insert(len(path),end)
+    while rho > 0.001:
+        x_traj.append(x)
+        y_traj.append(y)
+
+        x_diff = x_goal - x
+        y_diff = y_goal - y
+
+        rho = np.hypot(x_diff, y_diff)
+        alpha = (np.arctan2(y_diff, x_diff)
+                 - theta + np.pi) % (2 * np.pi) - np.pi
+        beta = (theta_goal - theta - alpha + np.pi) % (2 * np.pi) - np.pi
+
+        v = Kp_rho * rho
+        w = Kp_alpha * alpha + Kp_beta * beta
+
+        if alpha > np.pi / 2 or alpha < -np.pi / 2:
+            v = -v
+
+        theta = theta + w * dt
+        x = x + v * np.cos(theta) * dt
+        y = y + v * np.sin(theta) * dt
+
+    traj = np.asarray([np.asarray(x_traj),np.asarray(y_traj)]).T
     
-    # drop duplicates
-    df = pd.DataFrame(path)
-    path = np.asarray(df.drop_duplicates())
-    
-    # print(path)    
-    
-    return path
+    return traj
 
 def genTrajSet(mapSize,trajNum, firstFrame):
     
@@ -72,9 +104,6 @@ def genTrajSet(mapSize,trajNum, firstFrame):
         
     return trajs
 
-# [track_id ot ox oy dt dx dy av(1) type(1)]
-
-# trajs: list of vari-length traj [idx,x,y,frame]
 def genInput(trajsWithId):
     
     userInfo = []
@@ -93,29 +122,32 @@ def genInput(trajsWithId):
     df = pd.DataFrame (userInfo,columns=['track_id', 'oframe', 'ox', 'oy', 'dframe', 'dx', 'dy', 'av', 'type'])
     
     return df
-    
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     
     output_dir ='../data/synthetic/'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     
     mapSize = 10
-    trajNum = 600
-    firstFrame = 0
+    # trajNum = 600
+    # firstFrame = 0
     # trajs = genTrajSet(mapSize,trajNum,firstFrame) #list of [x,y,t]
     
     # multi traj sets examples - for discrete group
+    # genTrajSet(mapSize,trajNum, firstFrame)
     t1 = genTrajSet(mapSize,100,100)
-    t2 = genTrajSet(mapSize,200,300)
-    t3 = genTrajSet(mapSize,300,700)
+    t2 = genTrajSet(mapSize,200,50)
+    t3 = genTrajSet(mapSize,300,300)
     trajs = t1 + t2 +t3
     
     trajsWithId = [ np.c_[ (np.ones((len(trajs[i]),1))*i), trajs[i] ] for i in range(len(trajs))]
     userInfo = genInput(trajsWithId)
+    userInfo = userInfo.sort_values(by=['oframe']) # reorder by starting frame
     
     # trajs: list of vari-length traj [idx,x,y,frame]
     data = np.vstack(trajsWithId)
     
     np.save(output_dir+'synthetic_mapSize'+str(mapSize)+'_trajsWithId'+'.npy', data)
-    userInfo.to_csv(output_dir+'synthetic_mapSize'+str(mapSize)+'_userInfo'+'.csv',index=False)   
+    userInfo.to_csv(output_dir+'synthetic_mapSize'+str(mapSize)+'_userInfo'+'.csv',index=False) 
+

@@ -10,6 +10,7 @@ import numpy as np
 import os
 import time
 import matplotlib.pyplot as plt
+from scipy.spatial.distance import directed_hausdorff
 
 def isin(list1,x):
     for y in list1:
@@ -30,15 +31,37 @@ def OD_similarity(t1, t2):
     
     d = np.sqrt(sum((o1-o2)**2)) + np.sqrt(sum((d1-d2)**2))
     return d
+
+def hausdorff(t1, t2, trajsWithId):
+    # compare the simpilarity between 2 trajectories via Hausdorff distance
+    id1 = t1[0]
+    id2 = t2[0]
     
-# with OD
-def closest_node_dist(point, centers):
+    u = trajsWithId[np.argwhere(trajsWithId[:,0]==id1).ravel(),1:3]
+    v = trajsWithId[np.argwhere(trajsWithId[:,0]==id2).ravel(),1:3]
+    
+    # plt.plot(u[:,0],u[:,1])
+    # plt.plot(v[:,0],v[:,1])
+    
+    d = max(directed_hausdorff(u, v)[0], directed_hausdorff(v, u)[0])
+    
+    return d
+    
+# # with OD
+# def closest_node_dist(point, centers):
+#     #print(node, nodes)
+#     distList = [OD_similarity(point,i) for i in centers]
+#     correspId = distList.index(min(distList))
+#     return min(distList),correspId
+
+# # with Hausdorff dist
+def closest_node_dist(point, centers, trajsWithId):
     #print(node, nodes)
-    distList = [OD_similarity(point,i) for i in centers]
+    distList = [hausdorff(point,i,trajsWithId) for i in centers]
     correspId = distList.index(min(distList))
     return min(distList),correspId
 
-def meyerson(data, dimension, f,facil,overcount):
+def meyerson(data, dimension, f,facil,overcount, trajsWithId):
     data= np.random.permutation(data)
     facilities= []
     cost=0
@@ -51,7 +74,7 @@ def meyerson(data, dimension, f,facil,overcount):
             #print(counter)
         #find nearest facility
         if numberofcenters>0:
-            nearest,_ = closest_node_dist(point,facilities)
+            nearest,_ = closest_node_dist(point,facilities, trajsWithId)
             #print(nearest)
         else:
             nearest = f+1
@@ -80,15 +103,15 @@ def meyerson(data, dimension, f,facil,overcount):
     #cost=actualcost(data,facilities)+f*numberofcenters
     return facilities,cost,numberofcenters,overcount
 
-def meyersonmanytimes(data, dimension, f, times,facil,overcount):
-    minimum=meyerson(data,dimension,f,facil,overcount)
+def meyersonmanytimes(data, dimension, f, times,facil,overcount,trajsWithId):
+    minimum=meyerson(data,dimension,f,facil,overcount,trajsWithId)
     for i in range(1,times):
-        run=meyerson(data,dimension,f,facil,overcount)
+        run=meyerson(data,dimension,f,facil,overcount,trajsWithId)
         if run[1]<minimum[1]:
             minimum=run
     return minimum
 
-def DFL(data,dimension,f,n,timesrecompute,window,filename,th_group,th_waiting):
+def DFL(data,dimension,f,n,timesrecompute,window,filename,th_group,th_waiting, trajsWithId):
     
     filename='S'+filename
     g = open(filename,'w+')
@@ -123,7 +146,7 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_group,th_waiting):
             print('recompute because exceed waiting time')
             mutation.append(data[lowerbound,1])
             
-            lastfacil,lastcost,holder,overcount=meyersonmanytimes(currentdata,dimension,f,timesrecompute,currentfacil,overcount)
+            lastfacil,lastcost,holder,overcount=meyersonmanytimes(currentdata,dimension,f,timesrecompute,currentfacil,overcount,trajsWithId)
             howlong=4*lastcost/f
             TotalNumberofCentersOpened+=holder
             #print(howlong)
@@ -141,7 +164,7 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_group,th_waiting):
                 print('recompute because reach cost update criteria')
                 mutation.append(data[lowerbound,1])
                 
-                lastfacil,lastcost,holder,overcount=meyersonmanytimes(currentdata,dimension,f,timesrecompute,currentfacil,overcount)
+                lastfacil,lastcost,holder,overcount=meyersonmanytimes(currentdata,dimension,f,timesrecompute,currentfacil,overcount,trajsWithId)
                 howlong=4*lastcost/f
                 TotalNumberofCentersOpened+=holder
                 #print(howlong)
@@ -153,8 +176,8 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_group,th_waiting):
             else:                
                 mutation.append(data[lowerbound,1])
                 
-                currentcost-=closest_node_dist(data[lowerbound-1],currentfacil)[0]
-                nearest,_=closest_node_dist(data[upperbound],currentfacil) # or ub+1?
+                currentcost-=closest_node_dist(data[lowerbound-1],currentfacil, trajsWithId)[0]
+                nearest,_=closest_node_dist(data[upperbound],currentfacil, trajsWithId) # or ub+1?
                 if nearest<f:
                     print('update')
                     currentcost=currentcost+nearest
@@ -299,12 +322,12 @@ if __name__ == "__main__":
     # facilities,cost,numberofcenters,overcount = meyerson(data,2,20,[],0)   
     
     '''check multi Meyerson fun with sample data''' 
-    facilities,cost,numberofcenters,overcount = meyersonmanytimes(data,2, 6, 5,[],0)
+    facilities,cost,numberofcenters,overcount = meyersonmanytimes(data,2, 6, 5,[],0,trajsWithId)
     
     # extract users which has the same center
     centers = []
     for pt in data:
-        _,centerIdx = closest_node_dist(pt, facilities)
+        _,centerIdx = closest_node_dist(pt, facilities, trajsWithId)
         centers.append(centerIdx)
      
     group = []
