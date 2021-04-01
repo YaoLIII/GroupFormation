@@ -101,15 +101,15 @@ def plotResult(windowsize, userInfo, trajsWithId, facils_loc, mut_frame, dt):
         plt.scatter(existUser['ox'].tolist(), existUser['oy'].tolist(), 
                     s = 10, color='g', marker='^')
         
-        # for subt in userTrajSoFar:
-        #     # print(subt[0,0])
-        #     plt.plot(subt[:,1], subt[:,2], 'b--')
-        #     plt.scatter(subt[-1,1], subt[-1,2], s=10, color='r', marker='X')
-        #     plt.annotate(str(int(subt[0,0])),
-        #                  (subt[-1,1], subt[-1,2]),
-        #                  textcoords="offset points",
-        #                  xytext=(0,5),
-        #                  ha='right')
+        for subt in userTrajSoFar:
+            # print(subt[0,0])
+            plt.plot(subt[-3:,1], subt[-3:,2], 'b--')
+            plt.scatter(subt[-1,1], subt[-1,2], s=10, color='r', marker='X')
+            plt.annotate(str(int(subt[0,0])),
+                          (subt[-1,1], subt[-1,2]),
+                          textcoords="offset points",
+                          xytext=(0,5),
+                          ha='right')
     
         plt.xlim(min(ox)-2, max(ox)+2)
         plt.ylim(min(oy)-2, max(oy)+2)
