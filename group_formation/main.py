@@ -54,21 +54,26 @@ th_group = 15
 
 # 可以根据 mapSize*8 /(opencost/2) 算出大概同时存在最多fac数目
 dimension = 2
-openingcost = 10
+openingcost = 6
 numberofiterations = len(data)
 windowsize = 30
 file = 'test'
 
 facils,mutation,belong = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_group,th_waiting)
-# facils_loc = [np.unique((np.asarray(i)[:,2:4]),axis=0) for i in facils]
+# mutation is every upperbound for data index
+mutation.insert(0,windowsize) # at windowsize, the first set of facils appear
+mutation = list(map(int,mutation))
+mut_frame = [data[i,1] for i in mutation] # find the frame according to data order
 
 mut = np.argwhere(np.diff(list(map(len,facils)))!=0).ravel() + 1
 mut = np.insert(mut,0,0)
+# mut = np.insert(mut,len(mut),max(userInfo['dframe']))
+
 facils_dedup = [facils[i] for i in mut]
 facils_loc = [np.unique((np.asarray(i)[:,2:4]),axis=0) for i in facils_dedup]
 
 dt = 0.3
-VS.plotResult(userInfo, trajsWithId, facils_loc, mut, dt)
+VS.plotResult(windowsize, userInfo, trajsWithId, facils_loc, mut_frame, dt)
 
 # ox = userInfo['ox'].tolist()
 # oy = userInfo['oy'].tolist()

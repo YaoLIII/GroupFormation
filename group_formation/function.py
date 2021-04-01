@@ -133,7 +133,7 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_group,th_waiting):
             TotalRecompute+=1
             currentfacil=lastfacil
             
-            # decide which fail users belongs to (relative id of currentfacils)
+            # decide which facil users belongs to (relative id of currentfacils)
             correspIds = [closest_node_dist(point, currentfacil)[1] for point in currentdata]
             bel = np.c_[currentdata[:,0],np.asarray(correspIds)] #[traj_id, corresp_center]
             belong.append(bel)

@@ -56,7 +56,7 @@ def plotData(userInfo, trajsWithId, dt, show_animation):
         
             plt.pause(dt)
             
-def plotResult(userInfo, trajsWithId, facils_loc, mut, dt):
+def plotResult(windowsize, userInfo, trajsWithId, facils_loc, mut_frame, dt):
 
     ox = userInfo['ox'].tolist()
     oy = userInfo['oy'].tolist()
@@ -66,6 +66,8 @@ def plotResult(userInfo, trajsWithId, facils_loc, mut, dt):
     dframe = userInfo['dframe'].tolist()
     
     frameRange = [min(oframe),max(dframe)]
+    
+    mut_frame.insert(0,windowsize)
 
     # x = int(max(map(len,facils_loc))) #use relatiev center number - center per period
     # # x = len(userInfo) # absolute center number: id-color
@@ -89,18 +91,25 @@ def plotResult(userInfo, trajsWithId, facils_loc, mut, dt):
             
         # start to plot
         plt.cla()
-        plt.scatter(existUser['ox'].tolist(), existUser['oy'].tolist(), 
-                    color='g', marker='^')
         
-        for subt in userTrajSoFar:
-            print(subt[0,0])
-            plt.plot(subt[:,1], subt[:,2], 'b--')
-            plt.plot(subt[-1,1], subt[-1,2], color='r', marker='X')
-            plt.annotate(str(int(subt[0,0])),
-                         (subt[-1,1], subt[-1,2]),
-                         textcoords="offset points",
-                         xytext=(0,5),
-                         ha='right')
+        if f > frameRange[0]+windowsize and f<= mut_frame[-1]: # after historical data, start to have facils
+            f_idx = np.argwhere(f>np.asarray(mut_frame)).ravel()[-1] - 1
+            existFacils = facils_loc[f_idx]
+            plt.scatter(existFacils[:,0], existFacils[:,1], 
+                    s=100, color='orange', marker='o')
+            
+        plt.scatter(existUser['ox'].tolist(), existUser['oy'].tolist(), 
+                    s = 10, color='g', marker='^')
+        
+        # for subt in userTrajSoFar:
+        #     # print(subt[0,0])
+        #     plt.plot(subt[:,1], subt[:,2], 'b--')
+        #     plt.scatter(subt[-1,1], subt[-1,2], s=10, color='r', marker='X')
+        #     plt.annotate(str(int(subt[0,0])),
+        #                  (subt[-1,1], subt[-1,2]),
+        #                  textcoords="offset points",
+        #                  xytext=(0,5),
+        #                  ha='right')
     
         plt.xlim(min(ox)-2, max(ox)+2)
         plt.ylim(min(oy)-2, max(oy)+2)
