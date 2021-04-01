@@ -41,9 +41,13 @@ import visualize_synthetic as VS
 
 # test with synthetic data
 path = '../data/synthetic/'
+
 data = pd.read_csv(path + 'synthetic_mapSize10_userInfo.csv',sep=',')
-trajsWithId = np.load(path + 'synthetic_mapSize10_trajsWithId.npy')
 data = np.array(data.sort_values(by=['oframe']))
+
+userInfo = pd.read_csv(path + 'synthetic_mapSize10_userInfo.csv', sep=',')
+trajsWithId = np.load(path + 'synthetic_mapSize10_trajsWithId.npy')
+
 # split data via waitting time or group member numbers
 th_waiting = 40
 th_group = 15
@@ -55,35 +59,31 @@ numberofiterations = len(data)
 windowsize = 30
 file = 'test'
 
-facils,mutation = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_group,th_waiting)
-facils_loc = [np.unique((np.asarray(i)[:,2:4]),axis=0) for i in facils]
+facils,mutation,belong = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_group,th_waiting)
+# facils_loc = [np.unique((np.asarray(i)[:,2:4]),axis=0) for i in facils]
 
-userInfo = pd.read_csv(path + 'synthetic_mapSize10_userInfo.csv', sep=',')
+mut = np.argwhere(np.diff(list(map(len,facils)))!=0).ravel() + 1
+mut = np.insert(mut,0,0)
+facils_dedup = [facils[i] for i in mut]
+facils_loc = [np.unique((np.asarray(i)[:,2:4]),axis=0) for i in facils_dedup]
 
-ox = userInfo['ox'].tolist()
-oy = userInfo['oy'].tolist()
-# dx = userInfo['dx'].tolist()
-# dy = userInfo['dy'].tolist()
-oframe = userInfo['oframe'].tolist()
-dframe = userInfo['dframe'].tolist()
+dt = 0.3
+VS.plotResult(userInfo, trajsWithId, facils_loc, mut, dt)
 
-frameRange = [min(oframe),max(dframe)]
+# ox = userInfo['ox'].tolist()
+# oy = userInfo['oy'].tolist()
+# # dx = userInfo['dx'].tolist()
+# # dy = userInfo['dy'].tolist()
+# oframe = userInfo['oframe'].tolist()
+# dframe = userInfo['dframe'].tolist()
 
-mut = np.asarray(mutation)
-# mut = np.insert(mut,0,0)
-mut = np.insert(mut,len(mut),max(dframe))
+# frameRange = [min(oframe),max(dframe)]
 
-user_center_perPeriod = []
-for period in range(len(facils)):
-    centers = facils[period]
-    existUsers = userInfo[(userInfo['oframe']>=mut[period]) & (userInfo['oframe']<mut[period+1])]
-    # print(len(existUsers))
-    centerIds = []
-    for user in np.asarray(existUsers):
-        _,centerId = F.closest_node_dist(user, centers)
-        centerIds.append((user[0],centers[centerId][0])) #(user_id,its_center)
-        # centerIds.append((user[0], centerId)) #(user_id,its_center_in current period)
-    user_center_perPeriod.append(centerIds)
+# mut = np.asarray(mutation)
+# # mut = np.insert(mut,0,0)
+# mut = np.insert(mut,len(mut),max(dframe))
+
+
 
 # dt = 0.3
 # show_animation = True

@@ -107,7 +107,8 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_group,th_waiting):
     i = 0
     lowerbound = 0 #index of vary-length sliding window
     upperbound = lowerbound + window
-    mutation = []
+    mutation = [] # when facil number change
+    belong = []
     # flag = 0 # start of window
     # window_wid = window # vary window length
     
@@ -121,7 +122,7 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_group,th_waiting):
             currentdata = data[lowerbound:upperbound]
             
             print('recompute because exceed waiting time')
-            mutation.append(data[lowerbound,1])
+            mutation.append(data[upperbound,1])
             
             lastfacil,lastcost,holder,overcount=meyersonmanytimes(currentdata,dimension,f,timesrecompute,currentfacil,overcount)
             howlong=4*lastcost/f
@@ -131,6 +132,12 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_group,th_waiting):
             currentcost=lastcost
             TotalRecompute+=1
             currentfacil=lastfacil
+            
+            # decide which fail users belongs to (relative id of currentfacils)
+            correspIds = [closest_node_dist(point, currentfacil)[1] for point in currentdata]
+            bel = np.c_[currentdata[:,0],np.asarray(correspIds)] #[traj_id, corresp_center]
+            belong.append(bel)
+            
             lowerbound = upperbound
             upperbound = upperbound + window
             i += 1
@@ -139,7 +146,7 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_group,th_waiting):
             currentdata=data[lowerbound:upperbound]        
             if i-lasttime>howlong:
                 print('recompute because reach cost update criteria')
-                mutation.append(data[lowerbound,1])
+                mutation.append(data[upperbound,1])
                 
                 lastfacil,lastcost,holder,overcount=meyersonmanytimes(currentdata,dimension,f,timesrecompute,currentfacil,overcount)
                 howlong=4*lastcost/f
@@ -150,19 +157,31 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_group,th_waiting):
                 TotalRecompute+=1
                 currentfacil=lastfacil
                 
-            else:                
-                mutation.append(data[lowerbound,1])
+                # decide which fail users belongs to (relative id of currentfacils)
+                correspIds = [closest_node_dist(point, currentfacil)[1] for point in currentdata]
+                bel = np.c_[currentdata[:,0],np.asarray(correspIds)] #[traj_id, corresp_center]
+                belong.append(bel)
                 
-                currentcost-=closest_node_dist(data[lowerbound-1],currentfacil)[0]
-                nearest,_=closest_node_dist(data[upperbound],currentfacil) # or ub+1?
+            else:                
+                # mutation.append(data[upperbound,1])
+                
+                currentcost-=closest_node_dist(data[lowerbound-1],currentfacil)[0] # delete passed lowerbound-1 from facil?
+                nearest,cid=closest_node_dist(data[upperbound],currentfacil)
                 if nearest<f:
-                    print('update')
-                    currentcost=currentcost+nearest
-                else:
                     print('too close to open new facil')
+                    currentcost=currentcost+nearest
+                    bel = np.array([data[upperbound,0],cid])
+                    belong.append(bel)
+                else:
+                    print('update')
+                    mutation.append(data[upperbound,1])
                     currentcost=currentcost+f
                     TotalNumberofCentersOpened+=1
+                    bel = np.array([data[upperbound,0],len(currentfacil)]) # 是否加上所有的取值，而不只是新加的这个点
+                    belong.append(bel)
+                    
                     currentfacil.append(data[upperbound])
+                    
                 
             i += 1
             upperbound += 1
@@ -244,7 +263,7 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_group,th_waiting):
         
     #     i = i + 1
         
-    return facils,mutation
+    return facils,mutation,belong
 
 # def DFL_():        
 #     for i in range(0,n-window):
