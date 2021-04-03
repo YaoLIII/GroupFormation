@@ -56,7 +56,7 @@ def meyerson(data, dimension, f,facil,overcount):
         else:
             nearest = f+1
             #print('hej')
-        if np.random.random_sample()*2*f<nearest:
+        if np.random.random_sample()*f<nearest: # should multi 2 or not?
             #open center at this point
             #print('agurk')
             #facilities = np.append(facilities, point)
