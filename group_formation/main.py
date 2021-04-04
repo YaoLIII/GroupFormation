@@ -18,28 +18,29 @@ import matplotlib.pyplot as plt
 import math
 import visualize_synthetic as VS 
 
-# # test with SDD dataset/deathcircle
+# ''' test with SDD dataset/deathcircle '''
 # sample = 'deathCircle'
-# output_dir ='../data/stanford_campus_dataset/processed/'+ sample +'/'
+# file = 'video0'
+# path = '../data/stanford_campus_dataset/processed/'+ sample +'/'
 
-# files = os.listdir(output_dir)
-# # test:
-# file = files[0]
-# avg_info = files[1]
-# print('start to deal with '+ file + '...')
+# data = pd.read_csv(path + sample +'_' + file + '_userInfo.csv', sep=',')
+# userType = data.type.unique() #replace string with num
+# userType_dict = dict(zip(userType , range(len(userType ))))
+# data = data.replace({'type': userType_dict})
+# data = np.array(data.sort_values(by=['oframe']))
 
-# data = pd.read_csv(output_dir+file, delimiter=',')
-# avg_info = pd.read_csv(output_dir+avg_info, delimiter=',')
+# userInfo = pd.read_csv(path + sample +'_' + file + '_userInfo.csv', sep=',')
+# trajsWithId = np.load(path + sample +'_' + file +'_trajsWithId.npy')
 
-# ## convert df to numpy array
-# # replace type by numbers
-# user_type = data.type.unique()
-# type_dict = dict(zip(user_type, range(len(user_type))))
-# data = data.replace({'type':type_dict})
-# # [id, oframe, ox, oy, dframe, dx, dy, avg_v, type]
-# data = np.asarray(data.sort_values('oframe'))
+# th_waiting = 200
 
-# test with synthetic data
+# dimension = 2
+# openingcost = 200
+# numberofiterations = len(data)
+# windowsize = 100
+# file = 'test'
+
+''' test with synthetic data'''
 path = '../data/synthetic/'
 
 data = pd.read_csv(path + 'synthetic_mapSize10_userInfo.csv',sep=',')
@@ -49,11 +50,11 @@ userInfo = pd.read_csv(path + 'synthetic_mapSize10_userInfo.csv', sep=',')
 trajsWithId = np.load(path + 'synthetic_mapSize10_trajsWithId.npy')
 
 # split data via waitting time or group member numbers
-th_waiting = 40
+th_waiting = 15
 
 # 可以根据 mapSize*8 /(opencost/2) 算出大概同时存在最多fac数目
 dimension = 2
-openingcost = 20
+openingcost = 8
 numberofiterations = len(data)
 windowsize = 30
 file = 'test'
@@ -63,6 +64,7 @@ facils,mutation,belong = F.DFL(data,dimension,openingcost,numberofiterations,5,w
 mutation.insert(0,windowsize) # at windowsize, the first set of facils appear
 mutation = list(map(int,mutation))
 mut_frame = [data[i,1] for i in mutation] # find the frame according to data order
+# !!! 这里报错，肯定是mutation的idx和内容弄混了，需要重新检查可视化逻辑。另外，sdd数据库非常分散，可能效果不如synthetic好
 
 mut_facil = np.argwhere(np.diff(list(map(len,facils)))!=0).ravel() # when new facils are introduced
 # mut_facil = np.insert(mut_facil,0,0)

@@ -119,11 +119,20 @@ def plotResult(windowsize, userInfo, trajsWithId, facils_loc, mut_frame, dt):
             
 if __name__ == "__main__":
     
+    # synthetic data
     path = '../data/synthetic/'
     userInfo = pd.read_csv(path + 'synthetic_mapSize10_userInfo.csv', sep=',')
     trajsWithId = np.load(path + 'synthetic_mapSize10_trajsWithId.npy')
-    
     dt = 0.3
     show_animation = True
     
+    # # sdd - death circle - vido0
+    # sample = 'deathCircle'
+    # file = 'video0'
+    # path = '../data/stanford_campus_dataset/processed/'+ sample +'/'    
+    # userInfo = pd.read_csv(path + sample +'_' + file + '_userInfo.csv', sep=',')
+    # trajsWithId = np.load(path + sample +'_' + file +'_trajsWithId.npy')
+    # dt = 0.01
+    # show_animation = True   
+
     plotData(userInfo, trajsWithId, dt, show_animation)

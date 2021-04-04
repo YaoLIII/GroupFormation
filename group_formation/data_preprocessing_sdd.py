@@ -73,14 +73,14 @@ for file in files:
     trajsWithId = np.vstack(trajsWithId)
     np.save(output_dir + sample +'_' + file +'_trajsWithId.npy', trajsWithId)
     
-    # calculate the average speed of all types of road users
-    av_table = []
-    for user_type in userInfo['type'].unique():
-        all_av = userInfo[userInfo['type']==user_type]['av']
-        type_mean = all_av.mean()
-        av_table.append([user_type,type_mean])
-    df2 = pd.DataFrame (av_table,columns=['type','av'])
-    df2.to_csv(output_dir + file + '_average_speed_' + '.csv', sep=',', header=True, index=False)
+    # # calculate the average speed of all types of road users
+    # av_table = []
+    # for user_type in userInfo['type'].unique():
+    #     all_av = userInfo[userInfo['type']==user_type]['av']
+    #     type_mean = all_av.mean()
+    #     av_table.append([user_type,type_mean])
+    # df2 = pd.DataFrame (av_table,columns=['type','av'])
+    # df2.to_csv(output_dir + file + '_average_speed_' + '.csv', sep=',', header=True, index=False)
     
     # # plot the OD data
     # img = plt.imread( path + file + '/' + bgImg )
