@@ -2,14 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-
-Move to specified pose
-
-Author: Daniel Ingram (daniel-s-ingram)
-        Atsushi Sakai(@Atsushi_twi)
-
-P. I. Corke, "Robotics, Vision & Control", Springer 2017, ISBN 978-3-319-54413-7
-
+trajsWithId - np.array [idx,x,y,frame]
+userInfo - pd.dataframe ['track_id', 'oframe', 'ox', 'oy', 'dframe', 'dx', 'dy', 'av', 'type']
 """
 
 import matplotlib.pyplot as plt
