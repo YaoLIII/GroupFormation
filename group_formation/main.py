@@ -12,7 +12,8 @@ import numpy as np
 import os
 import time
 import random
-import function_similarity_Hausdorff as F
+# import function_similarity_Hausdorff as F
+import function as F
 import MeyersonS as MS
 import matplotlib.pyplot as plt
 import math
@@ -59,18 +60,26 @@ file = 'test'
 # windowsize = 30
 # file = 'test'
 
-# facils,mutation,belong = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_waiting)
-facils,mutation,belong = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_waiting,trajsWithId)
+facils,mutation,belong = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_waiting)
+# facils,mutation,belong = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_waiting,trajsWithId)
 
-# mutation is every upperbound for data index
-mutation.insert(0,windowsize) # at windowsize, the first set of facils appear
-mutation = list(map(int,mutation))
-mut_frame = [data[i,1] for i in mutation] # find the frame according to data order
+# # mutation is the frame f each time facils update
+# mutation.insert(0,data[windowsize-1,1]) # at windowsize, the first set of facils appear
+# mutation = np.unique(mutation)
+# mut_frame = list(map(int,mutation))
+
+# mutation = list(map(int,mutation))
+# mut_frame = [data[i,1] for i in mutation] # find the frame according to data order
 # !!! 这里报错，肯定是mutation的idx和内容弄混了，需要重新检查可视化逻辑。另外，sdd数据库非常分散，可能效果不如synthetic好
 
-mut_facil = np.argwhere(np.diff(list(map(len,facils)))!=0).ravel() # when new facils are introduced
-# mut_facil = np.insert(mut_facil,0,0)
-# mut = np.insert(mut,len(mut),max(userInfo['dframe']))
+# # 每次变化对应的 facil 
+# len_facil = list(map(len,facils))
+# len_facil.insert(0,0)
+# mut_facil = np.argwhere(np.diff(len_facil)!=0).ravel() # facils[mut_facil] when new facils are introduced
+# # mut_facil = np.insert(mut_facil,0,0)
+# # mut = np.insert(mut,len(mut),max(userInfo['dframe']))
+
+# 每次变化对应的从属关系 belong
 lenf = np.asarray(list(map(len,belong)))
 recompute = list(np.argwhere(lenf>2).ravel())
 split = [belong[i:j] for i, j in zip([0]+recompute, recompute+[None])]

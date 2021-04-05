@@ -122,7 +122,8 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_waiting):
             currentdata = data[lowerbound:upperbound]
             
             print('recompute because exceed waiting time')
-            mutation.append(data[upperbound,1])
+            # print(lowerbound)
+            mutation.append(data[upperbound-1,1])
             
             lastfacil,lastcost,holder,overcount=meyersonmanytimes(currentdata,dimension,f,timesrecompute,currentfacil,overcount)
             howlong=4*lastcost/f
@@ -132,6 +133,7 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_waiting):
             currentcost=lastcost
             TotalRecompute+=1
             currentfacil=lastfacil
+            facils.append(list(currentfacil))
             
             # decide which facil users belongs to (relative id of currentfacils)
             correspIds = [closest_node_dist(point, currentfacil)[1] for point in currentdata]
@@ -146,7 +148,7 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_waiting):
             currentdata=data[lowerbound:upperbound]        
             if i-lasttime>howlong:
                 print('recompute because reach cost update criteria')
-                mutation.append(data[upperbound,1])
+                mutation.append(data[upperbound-1,1])
                 
                 lastfacil,lastcost,holder,overcount=meyersonmanytimes(currentdata,dimension,f,timesrecompute,currentfacil,overcount)
                 howlong=4*lastcost/f
@@ -156,6 +158,7 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_waiting):
                 currentcost=lastcost
                 TotalRecompute+=1
                 currentfacil=lastfacil
+                facils.append(list(currentfacil))
                 
                 # decide which fail users belongs to (relative id of currentfacils)
                 correspIds = [closest_node_dist(point, currentfacil)[1] for point in currentdata]
@@ -174,20 +177,21 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_waiting):
                     belong.append(bel)
                 else:
                     print('update')
-                    mutation.append(data[upperbound,1])
+                    mutation.append(data[upperbound-1,1])
                     currentcost=currentcost+f
                     TotalNumberofCentersOpened+=1
                     bel = np.array([data[upperbound,0],len(currentfacil)]) # 是否加上所有的取值，而不只是新加的这个点
                     belong.append(bel)
                     
                     currentfacil.append(data[upperbound])
+                    facils.append(list(currentfacil))
                     
                 
             i += 1
             upperbound += 1
             lowerbound += 1
         
-        facils.append(list(currentfacil))
+        # facils.append(list(currentfacil))
         #print(currentcost, costReMey)
         if i%100==0:
              print(i,TotalNumberofCentersOpened,currentcost, time.time()-start,howlong,overcount)
