@@ -123,7 +123,8 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_waiting):
             
             print('recompute because exceed waiting time')
             # print(lowerbound)
-            mutation.append(data[upperbound-1,1])
+            mut = data[upperbound-1,1]
+            mutation.append(mut)
             
             lastfacil,lastcost,holder,overcount=meyersonmanytimes(currentdata,dimension,f,timesrecompute,currentfacil,overcount)
             howlong=4*lastcost/f
@@ -137,7 +138,7 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_waiting):
             
             # decide which facil users belongs to (relative id of currentfacils)
             correspIds = [closest_node_dist(point, currentfacil)[1] for point in currentdata]
-            bel = np.c_[currentdata[:,0],np.asarray(correspIds)] #[traj_id, corresp_center]
+            bel = np.c_[np.ones((len(currentdata),))*mut, currentdata[:,0],np.asarray(correspIds)] #[traj_id, corresp_center]
             belong.append(bel)
             
             lowerbound = upperbound
@@ -148,7 +149,8 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_waiting):
             currentdata=data[lowerbound:upperbound]        
             if i-lasttime>howlong:
                 print('recompute because reach cost update criteria')
-                mutation.append(data[upperbound-1,1])
+                mut = data[upperbound-1,1]
+                mutation.append(mut)
                 
                 lastfacil,lastcost,holder,overcount=meyersonmanytimes(currentdata,dimension,f,timesrecompute,currentfacil,overcount)
                 howlong=4*lastcost/f
@@ -162,25 +164,25 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_waiting):
                 
                 # decide which fail users belongs to (relative id of currentfacils)
                 correspIds = [closest_node_dist(point, currentfacil)[1] for point in currentdata]
-                bel = np.c_[currentdata[:,0],np.asarray(correspIds)] #[traj_id, corresp_center]
+                bel = np.c_[np.ones((len(currentdata),))*mut, currentdata[:,0],np.asarray(correspIds)] #[mutation,traj_id, corresp_center]
                 belong.append(bel)
                 
-            else:                
-                # mutation.append(data[upperbound,1])
+            else:
                 
                 currentcost-=closest_node_dist(data[lowerbound-1],currentfacil)[0] # delete passed lowerbound-1 from facil?
                 nearest,cid=closest_node_dist(data[upperbound],currentfacil)
                 if nearest<f:
                     print('too close to open new facil')
                     currentcost=currentcost+nearest
-                    bel = np.array([data[upperbound,0],cid])
+                    bel = np.array([data[upperbound-1,1],data[upperbound-1,0],cid])
                     belong.append(bel)
                 else:
                     print('update')
-                    mutation.append(data[upperbound-1,1])
+                    mut = data[upperbound-1,1]
+                    mutation.append(mut)
                     currentcost=currentcost+f
                     TotalNumberofCentersOpened+=1
-                    bel = np.array([data[upperbound,0],len(currentfacil)]) # 是否加上所有的取值，而不只是新加的这个点
+                    bel = np.array([data[upperbound-1,1],data[upperbound-1,0],len(currentfacil)]) # 是否加上所有的取值，而不只是新加的这个点
                     belong.append(bel)
                     
                     currentfacil.append(data[upperbound])

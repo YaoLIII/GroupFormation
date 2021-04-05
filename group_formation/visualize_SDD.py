@@ -1,110 +1,196 @@
-# # -*- coding: utf-8 -*-
-# """
-# visualizing result of dynamic facility location.
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Mar 22 15:05:20 2021
 
-# @author: li
-# """
-# import numpy as np
-# import pandas as pd
-
-# import matplotlib.pyplot as plt
+@author: li
+"""
+import os
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 # import matplotlib.animation as animation
 # from matplotlib.font_manager import FontProperties
 
-# read data
-# [id, oframe, ox, oy, dframe, dx, dy, avg_v, type]
+def plotData(userInfo, trajsWithId, dt):
 
-# def plotResult(data, facils_loc, facil_frames):
+    ox = userInfo['ox'].tolist()
+    oy = userInfo['oy'].tolist()
 
-    xmin = min(data[:,2])
-    xmax = max(data[:,2])
-    ymin = min(data[:,3])
-    ymax = max(data[:,3])
+    oframe = userInfo['oframe'].tolist()
+    dframe = userInfo['dframe'].tolist()
     
-    # create canvas
-    fig, ax = plt.subplots()
-    # img = plt.imread("../fig/background_Bergedorf.png")
-    # img = plt.imread("../fig/background_map.png")
-    img = plt.imread('../data/stanford_campus_dataset/annotations/deathCircle/' + 'video0' + '/' + 'reference.jpg' )
+    frameRange = [min(oframe),max(dframe)]
     
-    scat = ax.scatter(0,0)
-    # flag = 0
+    for f in np.arange(frameRange[0],frameRange[1]):
+        
+        existUser = userInfo[(userInfo['oframe']<=f) & (userInfo['dframe']>=f)]
+        existUserId = existUser['track_id']
+        existUserId = list(map(int,existUserId.tolist()))        
+        existUserTraj = [trajsWithId[trajsWithId[:,0]==i] for i in existUserId]
+        
+        userTrajSoFar = []
+        for t in existUserTraj:
+            userTrajSoFar.append(t[t[:,3]<=f])            
 
-    def update(t):
+        plt.cla()
+        # plt.scatter(existUser['ox'].tolist(), existUser['oy'].tolist(), 
+        #             color='g', marker='^')
         
-        print(t)
+        for subt in userTrajSoFar:
+            # print(subt[0,0])
+            plt.plot(subt[-3:,1], subt[-3:,2], 'b--')
+            plt.scatter(subt[-1,1], subt[-1,2], s=10, color='r', marker='X')
+            plt.annotate(str(int(subt[0,0])),
+                         (subt[-1,1], subt[-1,2]),
+                         textcoords="offset points",
+                         xytext=(0,5),
+                         ha='right')
     
-        x = data[data[:,1]==t][:,2].tolist()
-        y = data[data[:,1]==t][:,3].tolist()
-        user_type = data[data[:,1]==t][:,-1].tolist()     
-        user_id = data[data[:,1]==t][:,0].tolist()
-        
-        # fx = facils_loc[flag][:,0].tolist()
-        # fy = facils_loc[flag][:,1].tolist()
-        
-        # flag += 1
-        
-        ax.clear()
-        ax.set_title("Movements at time " + str(t))
-        ax.set_xlim(xmin,xmax)
-        ax.set_ylim(ymin,ymax)
-        ax.imshow(img, extent=[xmin, xmax, ymin, ymax])
-        tuples = tuple([x[k],y[k]] for k in range(len(x)))        
-        scat.set_offsets(tuples)
-        
-        # tuples_f = tuple([fx[k],fy[k]] for k in range(len(fx)))
-        # scat.set_offsets(tuples_f)
+        plt.xlim(min(ox)-2, max(ox)+2)
+        plt.ylim(min(oy)-2, max(oy)+2)
+        plt.title( "Before grouping - Movements at frame " + str(int(f)) )
+    
+        plt.pause(dt)
             
-        for j in range(len(tuples)):
-            ax.annotate(int(user_id[j]),tuples[j], size = 10)
-            
-        # for h in range(len(tuples_f)):
-        #     ax.annotate(tuples[j], size = 20)
-            
-        fontP = FontProperties()
-        fontP.set_size('large')
-            
-        # define colormap and markers
-        # cmap = plt.cm.get_cmap("prism",len(np.unique(df['user_id'])))
-        markers = ['^', 'o', 's','p','d','P']
-        # markers[1]: triangle_up, pedestrians
-        # markers[2]: circle, cyclists
-        # markers[3]: square, vehicles
-        
-        for i,j in enumerate(user_id):
-            if user_type[i] == 0:
-                m_idx = 0
-                c = 'orange'
-            elif  user_type[i] == 1:
-                m_idx = 1
-                c = 'red'
-            elif  user_type[i] == 2:
-                m_idx = 2
-                c = 'yellow'
-            elif  user_type[i] == 3:
-                m_idx = 3
-                c = 'green'
-            elif  user_type[i] == 4:
-                m_idx = 4
-                c = 'blue'
-            else:
-                m_idx = 5
-                c = 'cyan'
-            ax.scatter(x[i],y[i],s = 50, color = c, marker = markers[m_idx])
-        # # display legend
-        # plt.scatter([], [], s=40, color='k', marker='^', label='ped')
-        # plt.scatter([], [], s=40, color='k', marker='o', label='cyc')
-        # plt.scatter([], [], s=40, color='k', marker='s', label='veh')
-        # plt.legend(loc='lower right')
-        
-    anim = animation.FuncAnimation(fig, update, frames = data[:,1], \
-                            interval = 2, repeat = False)
-    plt.show()
+def plotResult_(windowsize, userInfo, trajsWithId, facils_loc, mut_frame, dt):
 
-# if __name__ == "__main__":
+    ox = userInfo['ox'].tolist()
+    oy = userInfo['oy'].tolist()
+    # dx = userInfo['dx'].tolist()
+    # dy = userInfo['dy'].tolist()
+    oframe = userInfo['oframe'].tolist()
+    dframe = userInfo['dframe'].tolist()
     
-#     sample = 'deathCircle'    
-#     output_dir = '../data/stanford_campus_dataset/processed/'+ sample +'/'
+    frameRange = [min(oframe),max(dframe)]
     
-#     f = np.load(output_dir + 'facilities_result.npy',allow_pickle=True)
+    mut_frame.insert(0,windowsize)
 
+    # x = int(max(map(len,facils_loc))) #use relatiev center number - center per period
+    # # x = len(userInfo) # absolute center number: id-color
+    # ys = [i+x+(i*x)**2 for i in range(x)]
+    
+    # colors = cm.rainbow(np.linspace(0, 1, len(ys)))
+    # colors = np.random.permutation(colors)
+    
+    for f in np.arange(frameRange[0],frameRange[1]):
+        
+        existUser = userInfo[(userInfo['oframe']<=f) & (userInfo['dframe']>=f)]
+        existUserId = existUser['track_id']
+        existUserId = list(map(int,existUserId.tolist()))
+        
+        allTrajs = np.vstack(trajsWithId)
+        existUserTraj = [allTrajs[allTrajs[:,0]==i] for i in existUserId]
+        
+        userTrajSoFar = []
+        for t in existUserTraj:
+            userTrajSoFar.append(t[t[:,3]<=f])
+            
+        # start to plot
+        plt.cla()
+        
+        if f > frameRange[0]+windowsize and f<= mut_frame[-1]: # after historical data, start to have facils
+            f_idx = np.argwhere(f>np.asarray(mut_frame)).ravel()[-1] - 1
+            existFacils = facils_loc[f_idx]
+            plt.scatter(existFacils[:,0], existFacils[:,1], 
+                    s=100, color='orange', marker='o')
+            
+        plt.scatter(existUser['ox'].tolist(), existUser['oy'].tolist(), 
+                    s = 10, color='g', marker='^')
+        
+        for subt in userTrajSoFar:
+            # print(subt[0,0])
+            plt.plot(subt[-3:,1], subt[-3:,2], 'b--')
+            plt.scatter(subt[-1,1], subt[-1,2], s=10, color='r', marker='X')
+            plt.annotate(str(int(subt[0,0])),
+                          (subt[-1,1], subt[-1,2]),
+                          textcoords="offset points",
+                          xytext=(0,5),
+                          ha='right')
+    
+        plt.xlim(min(ox)-2, max(ox)+2)
+        plt.ylim(min(oy)-2, max(oy)+2)
+        plt.title( "Movements at frame " + str(int(f)) )
+    
+        plt.pause(dt)
+        
+def plotResult(windowsize, userInfo, trajsWithId, facils, mutation, belong, dt, img_path):
+
+    ox = userInfo['ox'].tolist()
+    oy = userInfo['oy'].tolist()
+
+    oframe = userInfo['oframe'].tolist()
+    dframe = userInfo['dframe'].tolist()
+    
+    frameRange = [min(oframe),max(dframe)]
+    
+    # mutation.insert(len(mutation),max(dframe))
+
+    # x = int(max(map(len,facils))) #use relatiev center number - center per period
+    # # x = len(userInfo) # absolute center number: id-color
+    # ys = [i+x+(i*x)**2 for i in range(x)]    
+    # colors = cm.rainbow(np.linspace(0, 1, len(ys)))
+    # colors = np.random.permutation(colors)
+    
+    img = plt.imread(img_path)
+    
+    for f in np.arange(frameRange[0],frameRange[1],20):
+        
+        existUser = userInfo[(userInfo['oframe']<=f) & (userInfo['dframe']>=f)]
+        existUserId = existUser['track_id']
+        existUserId = list(map(int,existUserId.tolist()))        
+        existUserTraj = [trajsWithId[trajsWithId[:,0]==i] for i in existUserId]
+        
+        userTrajSoFar = []
+        for t in existUserTraj:
+            userTrajSoFar.append(t[t[:,3]<=f])
+            
+        # start to plot
+        plt.cla()
+        plt.imshow(img)
+        
+        mut = np.asarray(mutation,dtype=int)
+        period = np.argwhere(mut <= f).ravel()
+        if len(period)>0:
+            periodIdx = period[-1] # which period of facils 
+            existFacils = np.vstack(facils[periodIdx])
+            plt.scatter(existFacils[:,2], existFacils[:,3], 
+                        s=80, color='orange', marker='o')            
+            # plt.scatter(existUser['ox'].tolist(), existUser['oy'].tolist(), 
+            #             s = 10, color='g', marker='^')
+        
+        for subt in userTrajSoFar:
+            # print(subt[0,0])
+            plt.plot(subt[-100:,1], subt[-100:,2], 'b--')
+            plt.scatter(subt[-1,1], subt[-1,2], s=10, color='r', marker='X')
+            plt.annotate(str(int(subt[0,0])),
+                          (subt[-1,1], subt[-1,2]),
+                          textcoords="offset points",
+                          xytext=(0,5),
+                          ha='right')
+    
+        plt.xlim(min(ox)-2, max(ox)+2)
+        plt.ylim(min(oy)-2, max(oy)+2)
+        plt.title( "Movements at frame " + str(int(f)) )
+    
+        plt.pause(dt)
+            
+if __name__ == "__main__":
+    
+    # synthetic data
+    path = '../data/synthetic/'
+    userInfo = pd.read_csv(path + 'synthetic_mapSize10_userInfo.csv', sep=',')
+    trajsWithId = np.load(path + 'synthetic_mapSize10_trajsWithId.npy')
+    dt = 0.3
+    show_animation = True
+    
+    # # sdd - death circle - vido0
+    # sample = 'deathCircle'
+    # file = 'video0'
+    # path = '../data/stanford_campus_dataset/processed/'+ sample +'/'    
+    # userInfo = pd.read_csv(path + sample +'_' + file + '_userInfo.csv', sep=',')
+    # trajsWithId = np.load(path + sample +'_' + file +'_trajsWithId.npy')
+    # dt = 0.01
+    # show_animation = True   
+
+    plotData(userInfo, trajsWithId, dt)
