@@ -64,13 +64,14 @@ file = 'result_sdd'
 # file = 'result_syn'
 
 # ''' run methods'''
-facils,mutation,belong = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_waiting)
+# facils,mutation,belong = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_waiting)
+facils,mutation,belong = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_waiting,trajsWithId)
 belong = np.vstack(belong) # [frame,userId,relativeCenterId]
 # mutation: since frame [], facils start to change,only recompute & update
 # facils: corresp to mutation
 # belong: also includes 'too close' case, so has more item  
 
-# '''visualize with one period'''
+# # '''visualize with one period'''
 # mut = copy.deepcopy(mutation)
 # mut.append(max(userInfo['dframe']))
 # img = plt.imread(img_path)

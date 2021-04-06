@@ -194,7 +194,7 @@ def DFL(data,dimension,f,n,timesrecompute,window,filename,th_waiting):
             lowerbound += 1
         
         # facils.append(list(currentfacil))
-        #print(currentcost, costReMey)
+        # print(currentcost, costReMey)
         if i%100==0:
              print(i,TotalNumberofCentersOpened,currentcost, time.time()-start,howlong,overcount)
         g.write(str(i)+ " "+str(currentcost)+ " " + str(TotalNumberofCentersOpened) + " "+  str(time.time()-start)+ '\n')
