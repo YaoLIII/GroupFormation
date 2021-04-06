@@ -11,8 +11,8 @@ import pandas as pd
 import numpy as np
 import random
 import copy
-# import function_similarity_Hausdorff as F
-import function as F
+import function_similarity_Hausdorff as F
+# import function as F
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import visualize_synthetic as VS 
@@ -37,12 +37,59 @@ userInfo = userInfo.sort_values(by=['oframe'])
 trajsWithId = np.load(path + sample +'_' + file +'_trajsWithId.npy')
 
 th_waiting = 200
-
 dimension = 2
 openingcost = 200
 numberofiterations = len(data)
 windowsize = 30
 file = 'result_sdd'
+
+''' 
+run methods
+mutation: since frame [], facils start to change,only recompute & update
+facils: corresp to mutation
+belong: also includes 'too close' case, so has more item 
+'''
+
+# with Hausdorff
+facils,mutation,belong = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_waiting,trajsWithId)
+# # with OD
+# facils,mutation,belong = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_waiting)
+belong = np.vstack(belong) # [frame,userId,relativeCenterId]
+
+dt = 0.001
+VSDD.plotResult(windowsize, userInfo, trajsWithId, facils, mutation, belong, dt, img_path)
+
+# '''visualize with one period - sdd'''
+mut = copy.deepcopy(mutation)
+mut.append(max(userInfo['dframe']))
+img = plt.imread(img_path)
+
+for i in range(len(mutation)):
+    # i = 31
+    fRange = [mut[i],mut[i+1]]
+    trajsInCP = belong[(belong[:,0]>=mut[i]) & (belong[:,0]<mut[i+1])] # trajs in current period
+    centers = np.unique(trajsInCP[:,2]).astype(int)
+    # gen color map    
+    x = len(centers)
+    ys = [i+x+(i*x)**2 for i in range(x)]    
+    colors = cm.rainbow(np.linspace(0, 1, len(ys)))
+    colors = np.random.permutation(colors)
+    
+    fLoc = np.vstack(facils[i])
+    
+    plt.title('Group result in range: '+str(i)+str(fRange))
+    plt.imshow(img)
+    plt.scatter(fLoc[:,2],fLoc[:,3], s=80, color='orange', marker='o')
+    
+    for count,c in enumerate(centers):
+        trajGroup = trajsInCP[trajsInCP[:,2]==c][:,1]
+        trajs = [trajsWithId[trajsWithId[:,0]==idx] for idx in trajGroup]
+        for traj in trajs:
+            plt.plot(traj[:,1],traj[:,2],color=colors[count])
+    plt.pause(2)
+    plt.cla()
+
+
 
 
 # ''' test with synthetic data'''
@@ -58,23 +105,30 @@ file = 'result_sdd'
 # # split data via waitting time or group member numbers
 # th_waiting = 15
 # dimension = 2 # max(f_t) = mapSize*8 /(opencost/2)
-# openingcost = 8
+# openingcost = 4
 # numberofiterations = len(data)
 # windowsize = 30
 # file = 'result_syn'
 
-# ''' run methods'''
-# facils,mutation,belong = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_waiting)
-facils,mutation,belong = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_waiting,trajsWithId)
-belong = np.vstack(belong) # [frame,userId,relativeCenterId]
-# mutation: since frame [], facils start to change,only recompute & update
-# facils: corresp to mutation
-# belong: also includes 'too close' case, so has more item  
+# # ''' 
+# # run methods
+# # mutation: since frame [], facils start to change,only recompute & update
+# # facils: corresp to mutation
+# # belong: also includes 'too close' case, so has more item 
+# # '''
 
-# # '''visualize with one period'''
+# # with Hausdorff
+# # facils,mutation,belong = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_waiting,trajsWithId)
+# # with OD
+# facils,mutation,belong = F.DFL(data,dimension,openingcost,numberofiterations,5,windowsize,file,th_waiting)
+# belong = np.vstack(belong) # [frame,userId,relativeCenterId]
+
+# dt = 0.3
+# VS.plotResult(windowsize, userInfo, trajsWithId, facils, mutation, belong, dt) 
+
+# # '''visualize with one period - synthetic''
 # mut = copy.deepcopy(mutation)
 # mut.append(max(userInfo['dframe']))
-# img = plt.imread(img_path)
 
 # for i in range(len(mutation)):
 #     # i = 31
@@ -90,7 +144,6 @@ belong = np.vstack(belong) # [frame,userId,relativeCenterId]
 #     fLoc = np.vstack(facils[i])
     
 #     plt.title('Group result in range: '+str(i)+str(fRange))
-#     plt.imshow(img)
 #     plt.scatter(fLoc[:,2],fLoc[:,3], s=80, color='orange', marker='o')
     
 #     for count,c in enumerate(centers):
@@ -101,8 +154,5 @@ belong = np.vstack(belong) # [frame,userId,relativeCenterId]
 #     plt.pause(2)
 #     plt.cla()
 
-# VS.plotResult(windowsize, userInfo, trajsWithId, facils_loc, mut_frame, dt)
-dt = 0.001
-VSDD.plotResult(windowsize, userInfo, trajsWithId, facils, mutation, belong, dt, img_path)
         
         

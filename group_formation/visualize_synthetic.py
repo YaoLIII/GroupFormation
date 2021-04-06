@@ -12,7 +12,7 @@ import matplotlib.cm as cm
 # import matplotlib.animation as animation
 # from matplotlib.font_manager import FontProperties
 
-def plotData(userInfo, trajsWithId, dt, show_animation):
+def plotData(userInfo, trajsWithId, dt):
 
     ox = userInfo['ox'].tolist()
     oy = userInfo['oy'].tolist()
@@ -56,19 +56,15 @@ def plotData(userInfo, trajsWithId, dt, show_animation):
         
             plt.pause(dt)
             
-def plotResult(windowsize, userInfo, trajsWithId, facils_loc, mut_frame, dt):
+def plotResult(windowsize, userInfo, trajsWithId, facils, mutation, belong, dt):
 
     ox = userInfo['ox'].tolist()
     oy = userInfo['oy'].tolist()
-    # dx = userInfo['dx'].tolist()
-    # dy = userInfo['dy'].tolist()
+
     oframe = userInfo['oframe'].tolist()
     dframe = userInfo['dframe'].tolist()
     
     frameRange = [min(oframe),max(dframe)]
-    
-    mut_frame.insert(0,windowsize)
-
     # x = int(max(map(len,facils_loc))) #use relatiev center number - center per period
     # # x = len(userInfo) # absolute center number: id-color
     # ys = [i+x+(i*x)**2 for i in range(x)]
@@ -80,10 +76,8 @@ def plotResult(windowsize, userInfo, trajsWithId, facils_loc, mut_frame, dt):
         
         existUser = userInfo[(userInfo['oframe']<=f) & (userInfo['dframe']>=f)]
         existUserId = existUser['track_id']
-        existUserId = list(map(int,existUserId.tolist()))
-        
-        allTrajs = np.vstack(trajsWithId)
-        existUserTraj = [allTrajs[allTrajs[:,0]==i] for i in existUserId]
+        existUserId = list(map(int,existUserId.tolist()))        
+        existUserTraj = [trajsWithId[trajsWithId[:,0]==i] for i in existUserId]
         
         userTrajSoFar = []
         for t in existUserTraj:
@@ -92,14 +86,15 @@ def plotResult(windowsize, userInfo, trajsWithId, facils_loc, mut_frame, dt):
         # start to plot
         plt.cla()
         
-        if f > frameRange[0]+windowsize and f<= mut_frame[-1]: # after historical data, start to have facils
-            f_idx = np.argwhere(f>np.asarray(mut_frame)).ravel()[-1] - 1
-            existFacils = facils_loc[f_idx]
-            plt.scatter(existFacils[:,0], existFacils[:,1], 
-                    s=100, color='orange', marker='o')
-            
-        plt.scatter(existUser['ox'].tolist(), existUser['oy'].tolist(), 
-                    s = 10, color='g', marker='^')
+        mut = np.asarray(mutation,dtype=int)
+        period = np.argwhere(mut <= f).ravel()
+        if len(period)>0:
+            periodIdx = period[-1] # which period of facils 
+            existFacils = np.vstack(facils[periodIdx])
+            plt.scatter(existFacils[:,2], existFacils[:,3], 
+                        s=80, color='orange', marker='o')            
+            # plt.scatter(existUser['ox'].tolist(), existUser['oy'].tolist(), 
+            #             s = 10, color='g', marker='^')
         
         for subt in userTrajSoFar:
             # print(subt[0,0])
