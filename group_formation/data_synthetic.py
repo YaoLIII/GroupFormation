@@ -8,7 +8,7 @@ userInfo - pd.dataframe ['track_id', 'oframe', 'ox', 'oy', 'dframe', 'dx', 'dy',
 
 import matplotlib.pyplot as plt
 import numpy as np
-from random import random
+from random import uniform
 import pandas as pd
 import os
 
@@ -20,10 +20,13 @@ dt = 0.01
     
 def genSingleTraj(mapSize):
     
-    top = np.asarray([mapSize*random(), mapSize])
-    bottom = np.asarray([mapSize*random(), 0])
-    left = np.asarray([0, mapSize*random()])
-    right = np.asarray([mapSize, mapSize*random()])
+    minRoadWidth = mapSize/2 - 2
+    maxRoadWidth = mapSize/2 + 2
+    
+    top = np.asarray([uniform(minRoadWidth,maxRoadWidth), mapSize])
+    bottom = np.asarray([uniform(minRoadWidth,maxRoadWidth), 0])
+    left = np.asarray([0, uniform(minRoadWidth,maxRoadWidth)])
+    right = np.asarray([mapSize, uniform(minRoadWidth,maxRoadWidth)])
     
     start, end = np.random.permutation(np.asarray([top,bottom, left, right]))[0:2]
     
@@ -123,7 +126,7 @@ if __name__ == '__main__':
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     
-    mapSize = 10
+    mapSize = 12
     # trajNum = 600
     # firstFrame = 0
     # trajs = genTrajSet(mapSize,trajNum,firstFrame) #list of [x,y,t]
