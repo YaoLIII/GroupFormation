@@ -116,8 +116,8 @@ if __name__ == "__main__":
     
     # synthetic data
     path = '../data/synthetic/'
-    userInfo = pd.read_csv(path + 'synthetic_mapSize10_userInfo.csv', sep=',')
-    trajsWithId = np.load(path + 'synthetic_mapSize10_trajsWithId.npy')
+    userInfo = pd.read_csv(path + 'synthetic_mapSize12_userInfo.csv', sep=',')
+    trajsWithId = np.load(path + 'synthetic_mapSize12_trajsWithId.npy')
     dt = 0.3
     show_animation = True
     
@@ -130,4 +130,4 @@ if __name__ == "__main__":
     # dt = 0.01
     # show_animation = True   
 
-    plotData(userInfo, trajsWithId, dt, show_animation)
+    plotData(userInfo, trajsWithId, dt)

@@ -88,7 +88,7 @@ def meyersonmanytimes(data, dimension, f, times,facil,overcount):
             minimum=run
     return minimum
 
-def DFL(data,dimension,f,n,timesrecompute,window,filename,th_waiting):
+def DFL(data,dimension,f,timesrecompute,window,filename,th_waiting):
     
     filename='S'+filename
     g = open(filename,'w+')
