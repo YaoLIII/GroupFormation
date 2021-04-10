@@ -38,7 +38,7 @@ def closest_node_dist(point, centers):
     correspId = distList.index(min(distList))
     return min(distList),correspId
 
-def meyerson(data,f,facil,overcount): #facil is the current existing facil
+def meyerson(data, f,facil,overcount):
     data= np.random.permutation(data)
     facilities= []
     cost=0
@@ -54,9 +54,11 @@ def meyerson(data,f,facil,overcount): #facil is the current existing facil
             nearest,_ = closest_node_dist(point,facilities)
             #print(nearest)
         else:
-            nearest = f + 1
+            nearest = f+1
+            #print('hej')
         if np.random.random_sample()*f<nearest: # should multi 2 or not?
             #open center at this point
+            #print('agurk')
             #facilities = np.append(facilities, point)
             facilities.append(point) # move from before if to avoid duplicate            
             cost = cost + f # move from before if to avoid duplicate
@@ -82,13 +84,13 @@ def meyersonmanytimes(data, f, times,facil,overcount):
     minimum=meyerson(data,f,facil,overcount)
     for i in range(1,times):
         run=meyerson(data,f,facil,overcount)
-        # print(run[1])
         if run[1]<minimum[1]:
             minimum=run
     return minimum
 
 def DFL(data,f,timesrecompute,window,filename,th_waiting):
     
+    filename='S'+filename
     g = open(filename,'w+')
 
     lastcost=0
@@ -107,11 +109,13 @@ def DFL(data,f,timesrecompute,window,filename,th_waiting):
     upperbound = lowerbound + window
     mutation = [] # when facil number change
     belong = []
+    # flag = 0 # start of window
+    # window_wid = window # vary window length
     
     while upperbound < len(data):
-        # print(i)
         delta_t = data[upperbound,1] - data[lowerbound,1] #enter one point per step
         if delta_t > th_waiting: # waiting time exceed th_waiting
+            # print('reach the maximum waiting time!')
             waiting_period = data[:,1] - data[lowerbound,1] 
             newbound = np.where(waiting_period>th_waiting)[0][0] # idx: where exceed th_waiting
             upperbound = newbound
@@ -165,7 +169,7 @@ def DFL(data,f,timesrecompute,window,filename,th_waiting):
                 
             else:
                 
-                # currentcost-=closest_node_dist(data[lowerbound-1],currentfacil)[0] # delete passed lowerbound-1 from facil?
+                currentcost-=closest_node_dist(data[lowerbound-1],currentfacil)[0] # delete passed lowerbound-1 from facil?
                 nearest,cid=closest_node_dist(data[upperbound-1],currentfacil)
                 if nearest<f:
                     print('too close to open new facil')
@@ -190,9 +194,9 @@ def DFL(data,f,timesrecompute,window,filename,th_waiting):
             lowerbound += 1
         
         # facils.append(list(currentfacil))
-        print(currentcost)
-        # if i%100==0:
-        #      print(i,TotalNumberofCentersOpened,currentcost, time.time()-start,howlong,overcount)
+        # print(currentcost, costReMey)
+        if i%100==0:
+             print(i,TotalNumberofCentersOpened,currentcost, time.time()-start,howlong,overcount)
         g.write(str(i)+ " "+str(currentcost)+ " " + str(TotalNumberofCentersOpened) + " "+  str(time.time()-start)+ '\n')
         
     return facils,mutation,belong
@@ -204,44 +208,42 @@ if __name__ == "__main__":
     userInfo = pd.read_csv(path + 'synthetic_mapSize10_userInfo.csv', sep=',')
     trajsWithId = np.load(path + 'synthetic_mapSize10_trajsWithId.npy')
     
-    num = 100
+    num = 300
     
-    # plot sample users Origins
-    x = userInfo['ox'].iloc[0:num].tolist()
-    y = userInfo['oy'].iloc[0:num].tolist()
-    plt.plot(x,y,'.')
+    # # plot sample users Origins
+    # x = userInfo['ox'].iloc[0:num].tolist()
+    # y = userInfo['oy'].iloc[0:num].tolist()
+    # plt.plot(x,y,'.')
     
     # extract sample users
     data = userInfo.iloc[0:num,:].to_numpy()
-    # facilities,cost,numberofcenters,overcount = meyerson(data, 4, [], 0)   
+    # facilities,cost,numberofcenters,overcount = meyerson(data,2,20,[],0)   
     
-    # '''check multi Meyerson fun with sample data''' 
-    facilities,cost,numberofcenters,overcount = meyersonmanytimes(data, 4, 5, [], 0)
-    fLoc = np.asarray(facilities)[:,2:4]
-    plt.plot(fLoc[:,0],fLoc[:,1],'*')
+    '''check multi Meyerson fun with sample data''' 
+    facilities,cost,numberofcenters,overcount = meyersonmanytimes(data,2, 6, 5,[],0)
     
-    # # extract users which has the same center
-    # centers = []
-    # for pt in data:
-    #     _,centerIdx = closest_node_dist(pt, facilities)
-    #     centers.append(centerIdx)
+    # extract users which has the same center
+    centers = []
+    for pt in data:
+        _,centerIdx = closest_node_dist(pt, facilities)
+        centers.append(centerIdx)
      
-    # group = []
-    # plt.figure()   
-    # for c in np.unique(centers):
-    #     # users belongs to same group
-    #     groupId = np.argwhere(centers==c).ravel()
-    #     group.append(groupId)
-    #     for idx in groupId:
-    #         # extract user trajectory
-    #         user = trajsWithId[np.argwhere(trajsWithId[:,0]==idx).ravel()]
-    #         plt.xlim(-1, 11)
-    #         plt.ylim(-1, 11)
-    #         plt.plot(user[:,1],user[:,2],'*-')
-    #     plt.pause(0.5)
-    #     plt.cla()
+    group = []
+    plt.figure()   
+    for c in np.unique(centers):
+        # users belongs to same group
+        groupId = np.argwhere(centers==c).ravel()
+        group.append(groupId)
+        for idx in groupId:
+            # extract user trajectory
+            user = trajsWithId[np.argwhere(trajsWithId[:,0]==idx).ravel()]
+            plt.xlim(-1, 11)
+            plt.ylim(-1, 11)
+            plt.plot(user[:,1],user[:,2],'*-')
+        plt.pause(0.5)
+        plt.cla()
         
     
-    # # f_loc = np.asarray(facilities)[:,2:4]
-    # # plt.plot(f_loc[:,0],f_loc[:,1],'*')
+    # f_loc = np.asarray(facilities)[:,2:4]
+    # plt.plot(f_loc[:,0],f_loc[:,1],'*')
 
