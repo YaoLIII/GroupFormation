@@ -47,8 +47,6 @@ def meyerson(data,f,facil,overcount): #facil is the current existing facil
     for point in data:
         #print(point)
         counter=counter+1
-        #if counter % 100==0:
-            #print(counter)
         #find nearest facility
         if numberofcenters>0:
             nearest,_ = closest_node_dist(point,facilities)
@@ -62,9 +60,6 @@ def meyerson(data,f,facil,overcount): #facil is the current existing facil
             cost = cost + f # move from before if to avoid duplicate
             if isin(facil,point):
                 # print('already a facil')
-                # print(point)
-                # print(facilities)
-                # facilities.remove(point) # if this point is already in fac, remove duplicate
                 overcount+=1
                 #print(overcount)
             else:
@@ -110,7 +105,7 @@ def DFL(data,f,timesrecompute,window,filename,th_waiting):
     
     while upperbound < len(data):
         # print(i)
-        delta_t = data[upperbound,1] - data[lowerbound,1] #enter one point per step
+        delta_t = data[upperbound,1] - data[lowerbound,1] # count time interval
         if delta_t > th_waiting: # waiting time exceed th_waiting
             waiting_period = data[:,1] - data[lowerbound,1] 
             newbound = np.where(waiting_period>th_waiting)[0][0] # idx: where exceed th_waiting
@@ -156,7 +151,7 @@ def DFL(data,f,timesrecompute,window,filename,th_waiting):
                 currentcost=lastcost
                 TotalRecompute+=1
                 currentfacil=lastfacil
-                facils.append(list(currentfacil))
+                facils.append(list(currentfacil)) # recompute didn't ad facil until update finish???
                 
                 # decide which fail users belongs to (relative id of currentfacils)
                 correspIds = [closest_node_dist(point, currentfacil)[1] for point in currentdata]
@@ -182,12 +177,11 @@ def DFL(data,f,timesrecompute,window,filename,th_waiting):
                     belong.append(bel)
                     
                     currentfacil.append(data[upperbound-1])
-                    facils.append(list(currentfacil))
-                    
+                    facils.append(list(currentfacil))                  
                 
             i += 1
             upperbound += 1
-            lowerbound += 1
+            lowerbound += 1 #the first person will wait until current period ends
         
         # facils.append(list(currentfacil))
         # print(currentcost)

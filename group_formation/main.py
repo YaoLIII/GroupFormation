@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 1. read processed data
@@ -114,10 +114,9 @@ for i in range(len(mutation)):
 # trajsWithId = np.load(path + 'synthetic_mapSize12_trajsWithId.npy')
 
 # # split data via waitting time or group member numbers
-# th_waiting = 15
-# dimension = 2 # max(f_t) = mapSize*8 /(opencost/2)
+# th_waiting = 15 # max(f_t) = mapSize*8 /(opencost/2)
 # openingcost = 4
-# numberofiterations = len(data)
+# # numberofiterations = len(data)
 # windowsize = 30
 # file = 'result_syn'
 
