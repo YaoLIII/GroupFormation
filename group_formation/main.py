@@ -41,10 +41,10 @@ userInfo = userInfo.replace({'type': userType_dict})
 userInfo = userInfo.sort_values(by=['oframe'])
 trajsWithId = np.load(path + sample +'_' + file +'_trajsWithId.npy')
 
-th_waiting = 100
-openingcost = 100
-windowsize = 100
-file = 'result_sdd_ownMethod_f100.txt'
+th_waiting = 200
+openingcost = 200
+windowsize = 30
+file = 'result_sdd_ownMethod.txt'
 
 # # with Hausdorff
 # facils,mutation,belong = F.DFL(data,dimension,openingcost,5,windowsize,file,th_waiting,trajsWithId)
@@ -54,6 +54,23 @@ belong = np.vstack(belong) # [frame,userId,relativeCenterId]
 
 dt = 0.001
 # VSDD.plotResult(windowsize, userInfo, trajsWithId, facils, mutation, belong, dt, img_path)
+
+# # print group info
+# mut = copy.deepcopy(mutation)
+# mut.append(max(userInfo['dframe']))
+
+# avgGroupSize = []
+# groupSize = []
+# for i in range(len(mutation)):
+#     fRange = [mut[i],mut[i+1]]
+#     trajsInCP = belong[(belong[:,0]>=mut[i]) & (belong[:,0]<mut[i+1])] # trajs in current period
+#     relativeCenterId = np.unique(trajsInCP[:,2]).astype(int) #relative id of centers
+#     userNum = len(trajsInCP)
+#     groupSize.append(len(relativeCenterId))
+#     avgGroupSize.append(userNum/len(relativeCenterId))
+# print('current average group size is: ' + str(sum(avgGroupSize)/len(mutation)))
+# min(groupSize)
+# max(groupSize)
 
 # '''visualize with one period - sdd''
 mut = copy.deepcopy(mutation)

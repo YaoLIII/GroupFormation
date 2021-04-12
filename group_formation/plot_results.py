@@ -112,7 +112,7 @@ plt.xlabel('Number of updates')
 # h = 15
 X = 0
 S = 0
-with open('result_sdd_ownMethod_f100.txt') as f:
+with open('result_sdd_ownMethod_h1.txt') as f:
     liste = f.readlines()
     A1=[]
     A2=[]
@@ -125,7 +125,7 @@ with open('result_sdd_ownMethod_f100.txt') as f:
         A2.append(float(line[2]))
         A3.append(float(line[3]))
         
-with open('result_sdd_ownMethod_f500.txt') as f:
+with open('result_sdd_ownMethod_h10.txt') as f:
     liste = f.readlines()
     B1=[]
     B2=[]
@@ -139,7 +139,7 @@ with open('result_sdd_ownMethod_f500.txt') as f:
         B3.append(float(line[3]))
         #avg=float(line[1])
         
-with open('result_sdd_ownMethod_f1000.txt') as f:
+with open('result_sdd_ownMethod_h20.txt') as f:
     liste = f.readlines()
     C1=[]
     C2=[]
@@ -154,25 +154,25 @@ with open('result_sdd_ownMethod_f1000.txt') as f:
         
 plt.figure(1)
 plt.ylabel('Cost')
-plt.plot(A1[S:X],label = 'f100')
-plt.plot(B1[S:X],label = 'f500')
-plt.plot(C1[S:X],label = 'f1000')
+plt.plot(A1[S:X],label = 'h1')
+plt.plot(B1[S:X],label = 'h10')
+plt.plot(C1[S:X],label = 'h20')
 pylab.legend(loc='upper left')
 plt.xlabel('Number of updates')
 plt.show()
 
 plt.figure(2)
 plt.ylabel('Clusters opened (log scale)')
-plt.semilogy(A2[S:X],label = 'f100')
-plt.semilogy(B2[S:X],label = 'f500')
-plt.semilogy(C2[S:X],label = 'f1000')
+plt.semilogy(A2[S:X],label = 'h1')
+plt.semilogy(B2[S:X],label = 'h10')
+plt.semilogy(C2[S:X],label = 'h20')
 pylab.legend(loc='upper left')
 plt.xlabel('Number of updates')
 
 plt.figure(3)
 plt.ylabel('Time in seconds (log scale)')
-plt.semilogy(A3[S:X],label = 'f100')
-plt.semilogy(B3[S:X],label = 'f500')
-plt.semilogy(C3[S:X],label = 'f1000')
+plt.semilogy(A3[S:X],label = 'h1')
+plt.semilogy(B3[S:X],label = 'h10')
+plt.semilogy(C3[S:X],label = 'h20')
 pylab.legend(loc='upper left')
 plt.xlabel('Number of updates')
