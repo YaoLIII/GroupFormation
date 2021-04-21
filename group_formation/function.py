@@ -160,7 +160,7 @@ def DFL(data,f,timesrecompute,window,filename,th_waiting):
                 
             else:
                 
-                # currentcost-=closest_node_dist(data[lowerbound-1],currentfacil)[0] # delete passed lowerbound-1 from facil?
+                # currentcost-=closest_node_dist(data[lowerbound-1],currentfacil)[0] # delete passed lowerbound-1 from facil
                 nearest,cid=closest_node_dist(data[upperbound-1],currentfacil)
                 if nearest<f:
                     print('too close to open new facil')
@@ -169,8 +169,8 @@ def DFL(data,f,timesrecompute,window,filename,th_waiting):
                     belong.append(bel)
                 else:
                     print('update')
-                    mut = data[upperbound-1,1]
-                    mutation.append(mut)
+                    # mut = data[upperbound-1,1]
+                    # mutation.append(mut)
                     currentcost=currentcost+f
                     TotalNumberofCentersOpened+=1
                     bel = np.array([data[upperbound-1,1],data[upperbound-1,0],len(currentfacil)]) # 是否加上所有的取值，而不只是新加的这个点
