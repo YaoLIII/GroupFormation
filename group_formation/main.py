@@ -45,7 +45,7 @@ trajsWithId = np.load(path + sample +'_' + file +'_trajsWithId.npy')
 th_waiting = 900
 openingcost = 200
 windowsize = 20
-file = 'result_sdd_ownMethod_h20.txt'
+file = 'result_sdd_ownMethod_visualize.txt'
 
 # # with Hausdorff
 # facils,mutation,belong = F.DFL(data,dimension,openingcost,5,windowsize,file,th_waiting,trajsWithId)
@@ -80,39 +80,44 @@ print('maximum group size: ' + str(max(groupSize)))
 print('the biggest group contains ' + str(max(maxNumGroupMember)) + ' members')
 
 # calculate cost per update
-result = pd.read_csv('result_sdd_ownMethod_h20.txt', header = None, delimiter = " ")
+result = pd.read_csv('result_sdd_ownMethod_visualize.txt', header = None, delimiter = " ")
 result.columns = ["updateId", "cost", "openedFacilsNum", "time"]
 print('the cost per update: ' + str(result['cost'].mean()))
 
-# # '''visualize with one period - sdd''
-# mut = copy.deepcopy(mutation)
-# mut.append(max(userInfo['dframe']))
-
-# img = plt.imread(img_path)
-
-# for i in range(len(mutation)):
-#     fRange = [mut[i],mut[i+1]]
-#     trajsInCP = belong[(belong[:,0]>=mut[i]) & (belong[:,0]<mut[i+1])] # trajs in current period
-#     relativeCenterId = np.unique(trajsInCP[:,2]).astype(int) #relative id of centers
-#     # gen color map    
-#     x = len(facils[i])
-#     ys = [i+x+(i*x)**2 for i in range(x)]
-#     colors = cm.rainbow(np.linspace(0, 1, len(ys)))
-#     colors = np.random.permutation(colors)
+'''visualize'''
+img = plt.imread(img_path)
+# currentFacils = copy.deepcopy(facils)
+for i in range(len(mutation)):
     
-#     fLoc = np.vstack(facils[i])[relativeCenterId] # just plot facils for new coming users
+    fRange = [mut[i],mut[i+1]]
+    trajsInCP = belong[(belong[:,0]>=mut[i]) & (belong[:,0]<mut[i+1])] # trajs in current period
+    relativeCenterId = np.unique(trajsInCP[:,2]).astype(int) #relative id of centers
     
-#     plt.title('Group results in Period '+ str(i) + ' (frame ' + str(fRange) + ')')
-#     plt.scatter(fLoc[:,2],fLoc[:,3], s=80, c=colors[relativeCenterId], marker='x')
-#     plt.imshow(img)
+    facilNumInCP = max(relativeCenterId) + 1  # num of facils in current period
+    facilNumAll = list(map(len,facils))
+    facilIdInCP = facilNumAll.index(facilNumInCP)
+    facilsInCP = facils[facilIdInCP]
+    facils = facils[facilIdInCP+1:]
     
-#     for count,c in enumerate(relativeCenterId):
-#         trajGroup = trajsInCP[trajsInCP[:,2]==c][:,1]
-#         trajs = [trajsWithId[trajsWithId[:,0]==idx] for idx in trajGroup]
-#         for traj in trajs:
-#             plt.plot(traj[:,1],traj[:,2],color=colors[c])
-#     plt.pause(2)
-#     plt.cla()
+    # gen color map
+    x = len(facilsInCP)
+    ys = [i+x+(i*x)**2 for i in range(x)]
+    colors = cm.rainbow(np.linspace(0, 1, len(ys)))
+    colors = np.random.permutation(colors)
+    
+    fLoc = np.vstack(facilsInCP)
+    
+    plt.title('Group results in Period '+ str(i) + ' (frame ' + str(fRange) + ')')
+    plt.scatter(fLoc[:,2],fLoc[:,3], s=80, c=colors, marker='x')
+    plt.imshow(img)
+    
+    for count,c in enumerate(relativeCenterId):
+        trajGroup = trajsInCP[trajsInCP[:,2]==c][:,1]
+        trajs = [trajsWithId[trajsWithId[:,0]==idx] for idx in trajGroup]
+        for traj in trajs:
+            plt.plot(traj[:,1],traj[:,2],color=colors[c])
+    plt.pause(2)
+    plt.cla()
 
 
 # ''' test with synthetic data'''

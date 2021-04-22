@@ -20,8 +20,8 @@ dt = 0.01
     
 def genSingleTraj(mapSize):
     
-    minRoadWidth = mapSize/2 - 2
-    maxRoadWidth = mapSize/2 + 2
+    minRoadWidth = mapSize/2 - 4
+    maxRoadWidth = mapSize/2 + 4
     
     top = np.asarray([uniform(minRoadWidth,maxRoadWidth), mapSize])
     bottom = np.asarray([uniform(minRoadWidth,maxRoadWidth), 0])

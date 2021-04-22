@@ -55,22 +55,18 @@ def meyerson(data,f,facil,overcount): #facil is the current existing facil
             nearest = f + 1
         if np.random.random_sample()*f<nearest: # should multi 2 or not?
             #open center at this point
-            #facilities = np.append(facilities, point)
-            facilities.append(point) # move from before if to avoid duplicate            
-            cost = cost + f # move from before if to avoid duplicate
+            facilities.append(point)         
+            cost = cost + f
             if isin(facil,point):
                 # print('already a facil')
                 overcount+=1
                 #print(overcount)
             else:
                 numberofcenters += 1
-                # facilities.append(point) # move from before if to avoid duplicate
-                # cost = cost + f # move from before if to avoid duplicate
             
         else:
             cost = cost + nearest
-    #print(counter)
-    #cost=actualcost(data,facilities)+f*numberofcenters
+
     return facilities,cost,numberofcenters,overcount
 
 def meyersonmanytimes(data, f, times,facil,overcount):
