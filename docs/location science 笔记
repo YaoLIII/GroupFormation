@@ -1,9 +1,0 @@
-Chap 2 p-median problems
-
-2.1 Introduction
-In this chapter we deal with a problem in the family of median problems. This term, in contrast with others like center and equity, refers to the definition of the cost to be minimized. When we speak about median (or minisum) problems we mean that the objective to be minimized depends in equal measure on the costs associated with each of the users.
-
-The letter p in the term p-median refers to the number of locations to be chosen among the candidates, which is fixed beforehand. In other words, in the p-median problem a fixed number of p locations, usually called medians, must be chosen from the set of candidate facilities.
-
-2.2 Application
-Clustering was one of the first applications of the p-median problem. In the paper by Vinod (1969) it is said that a large number of objects, persons, variables, symbols, etc. have been often to be grouped into a smaller number of mutually exclusive groups so that members within a group are similar to each other in some sense. There is a limited number of groups, each of them having a distinguished member called centroid. The fitness of the partition depends on the average similarity of each object with the centroid of its group. The similarity between two pairs can be calculated from the input data and would correspond with costs (d_j cij ) in our problem. The number of groups or clusters would be p and the centroids would be our medians.
