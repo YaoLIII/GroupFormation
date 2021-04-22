@@ -44,8 +44,8 @@ trajsWithId = np.load(path + sample +'_' + file +'_trajsWithId.npy')
 
 th_waiting = 900
 openingcost = 200
-windowsize = 10
-file = 'result_sdd_ownMethod.txt'
+windowsize = 20
+file = 'result_sdd_ownMethod_h20.txt'
 
 # # with Hausdorff
 # facils,mutation,belong = F.DFL(data,dimension,openingcost,5,windowsize,file,th_waiting,trajsWithId)
@@ -80,7 +80,7 @@ print('maximum group size: ' + str(max(groupSize)))
 print('the biggest group contains ' + str(max(maxNumGroupMember)) + ' members')
 
 # calculate cost per update
-result = pd.read_csv('result_sdd_ownMethod.txt', header = None, delimiter = " ")
+result = pd.read_csv('result_sdd_ownMethod_h20.txt', header = None, delimiter = " ")
 result.columns = ["updateId", "cost", "openedFacilsNum", "time"]
 print('the cost per update: ' + str(result['cost'].mean()))
 
