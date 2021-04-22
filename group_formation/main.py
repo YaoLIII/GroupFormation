@@ -21,7 +21,8 @@ import function as F
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import visualize_synthetic as VS 
-import visualize_SDD as VSDD 
+import visualize_SDD as VSDD
+import collections
 
 ''' test with SDD dataset/deathcircle '''
 sample = 'deathCircle'
@@ -62,18 +63,21 @@ mut.append(max(userInfo['dframe']))
 avgGroupSize = []
 groupSize = []
 compressRate = []
+maxNumGroupMember = []
 for i in range(len(mutation)):
     fRange = [mut[i],mut[i+1]]
     trajsInCP = belong[(belong[:,0]>=mut[i]) & (belong[:,0]<mut[i+1])] # trajs in current period
     relativeCenterId = np.unique(trajsInCP[:,2]).astype(int) #relative id of centers
     userNum = len(trajsInCP)
+    maxNumGroupMember.append(max(collections.Counter(trajsInCP[:,2]).values()))
     groupSize.append(len(relativeCenterId))
     avgGroupSize.append(userNum/len(relativeCenterId))
-    compressRate.append(len(relativeCenterId)/userNum)
+    compressRate.append(1 - len(relativeCenterId)/userNum)
 print('current average group size is: ' + str(sum(avgGroupSize)/len(mutation)))
-print('current average compress rate is: ' + str(sum(compressRate)/len(mutation)))
+print('current avg saving space rate is: ' + str(sum(compressRate)/len(mutation)))
 print('minimum group size: ' + str(min(groupSize)))
 print('maximum group size: ' + str(max(groupSize)))
+print('the biggest group contains ' + str(max(maxNumGroupMember)) + ' members')
 
 # calculate cost per update
 result = pd.read_csv('result_sdd_ownMethod.txt', header = None, delimiter = " ")
