@@ -32,7 +32,7 @@ img_path = '../data/stanford_campus_dataset/annotations/'+ sample + '/'+file+'/r
 
 data = pd.read_csv(path + sample +'_' + file + '_userInfo.csv', sep=',')
 userType = data.type.unique() #replace string with num
-userType_dict = dict(zip(userType , range(len(userType ))))
+userType_dict = dict(zip(userType , range(len(userType))))
 data = data.replace({'type': userType_dict})
 data = np.array(data.sort_values(by=['oframe']))
 
@@ -42,10 +42,10 @@ userInfo = userInfo.replace({'type': userType_dict})
 userInfo = userInfo.sort_values(by=['oframe'])
 trajsWithId = np.load(path + sample +'_' + file +'_trajsWithId.npy')
 
-th_waiting = 140000
+th_waiting = 900
 openingcost = 200
 windowsize = 10
-file = '../result/result_sdd_cohen_added.txt'
+file = '../result/result.txt'
 
 # # with Hausdorff
 # facils,mutation,belong = F.DFL(data,dimension,openingcost,5,windowsize,file,th_waiting,trajsWithId)
@@ -80,12 +80,14 @@ print('maximum group size: ' + str(max(groupSize)))
 print('the biggest group contains ' + str(max(maxNumGroupMember)) + ' members')
 
 # calculate cost per update
-result = pd.read_csv('../result/result_sdd_cohen_added.txt', header = None, delimiter = " ")
+result = pd.read_csv('../result/result.txt', header = None, delimiter = " ")
 result.columns = ["updateId", "cost", "openedFacilsNum", "time"]
 print('the cost per update: ' + str(result['cost'].mean()))
 
 '''visualize'''
 img = plt.imread(img_path)
+lineStyle = ['solid','dotted','dashed','dashdot',(0, (3, 1, 1, 1)),(0, (5, 10))]
+lineStyle_dict = dict(zip(range(len(userType)), lineStyle))
 # currentFacils = copy.deepcopy(facils)
 for i in range(len(mutation)):
     
@@ -115,6 +117,9 @@ for i in range(len(mutation)):
         trajGroup = trajsInCP[trajsInCP[:,2]==c][:,1]
         trajs = [trajsWithId[trajsWithId[:,0]==idx] for idx in trajGroup]
         for traj in trajs:
-            plt.plot(traj[:,1],traj[:,2],color=colors[c])
+            idx = traj[0][0]
+            userType = userInfo[userInfo['track_id']==idx].type.item()
+            plt.plot(traj[:,1],traj[:,2],color=colors[c], 
+                     linestyle=lineStyle_dict[userType])
     plt.pause(2)
     plt.cla()
