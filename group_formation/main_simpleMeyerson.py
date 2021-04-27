@@ -160,7 +160,7 @@ if __name__ == "__main__":
     trajsWithId = np.load(path + sample +'_' + file +'_trajsWithId.npy')
     
     f = 200
-    file = 'result_sdd_simpleMeyerson_1.txt'
+    file = '../result/result_sdd_simpleMeyerson.txt'
     facil = []
     overcount = 0
     

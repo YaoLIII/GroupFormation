@@ -65,13 +65,6 @@ def plotResult_(windowsize, userInfo, trajsWithId, facils_loc, mut_frame, dt):
     frameRange = [min(oframe),max(dframe)]
     
     mut_frame.insert(0,windowsize)
-
-    # x = int(max(map(len,facils_loc))) #use relatiev center number - center per period
-    # # x = len(userInfo) # absolute center number: id-color
-    # ys = [i+x+(i*x)**2 for i in range(x)]
-    
-    # colors = cm.rainbow(np.linspace(0, 1, len(ys)))
-    # colors = np.random.permutation(colors)
     
     for f in np.arange(frameRange[0],frameRange[1]):
         
@@ -124,14 +117,6 @@ def plotResult(windowsize, userInfo, trajsWithId, facils, mutation, belong, dt, 
     
     frameRange = [min(oframe),max(dframe)]
     
-    # mutation.insert(len(mutation),max(dframe))
-
-    # x = int(max(map(len,facils))) #use relatiev center number - center per period
-    # # x = len(userInfo) # absolute center number: id-color
-    # ys = [i+x+(i*x)**2 for i in range(x)]    
-    # colors = cm.rainbow(np.linspace(0, 1, len(ys)))
-    # colors = np.random.permutation(colors)
-    
     img = plt.imread(img_path)
     
     for f in np.arange(frameRange[0],frameRange[1],20):
@@ -174,32 +159,6 @@ def plotResult(windowsize, userInfo, trajsWithId, facils, mutation, belong, dt, 
         plt.title( "Movements at frame " + str(int(f)) )
     
         plt.pause(dt)
-        
-        # mut = np.asarray(mutation,dtype=int)
-        # period = np.argwhere(mut <= f).ravel()
-        # if len(period)>0:
-        #     periodIdx = period[-1] # which period of facils 
-        #     existFacils = np.vstack(facils[periodIdx])
-        #     plt.scatter(existFacils[:,2], existFacils[:,3], 
-        #                 s=80, color='orange', marker='o')            
-        #     # plt.scatter(existUser['ox'].tolist(), existUser['oy'].tolist(), 
-        #     #             s = 10, color='g', marker='^')
-        
-        # for subt in userTrajSoFar:
-        #     # print(subt[0,0])
-        #     plt.plot(subt[-100:,1], subt[-100:,2], 'b--')
-        #     plt.scatter(subt[-1,1], subt[-1,2], s=10, color='r', marker='X')
-        #     plt.annotate(str(int(subt[0,0])),
-        #                   (subt[-1,1], subt[-1,2]),
-        #                   textcoords="offset points",
-        #                   xytext=(0,5),
-        #                   ha='right')
-    
-        # plt.xlim(min(ox)-2, max(ox)+2)
-        # plt.ylim(min(oy)-2, max(oy)+2)
-        # plt.title( "Movements at frame " + str(int(f)) )
-    
-        # plt.pause(dt)
             
 if __name__ == "__main__":
     
@@ -209,14 +168,5 @@ if __name__ == "__main__":
     trajsWithId = np.load(path + 'synthetic_mapSize10_trajsWithId.npy')
     dt = 0.3
     show_animation = True
-    
-    # # sdd - death circle - vido0
-    # sample = 'deathCircle'
-    # file = 'video0'
-    # path = '../data/stanford_campus_dataset/processed/'+ sample +'/'    
-    # userInfo = pd.read_csv(path + sample +'_' + file + '_userInfo.csv', sep=',')
-    # trajsWithId = np.load(path + sample +'_' + file +'_trajsWithId.npy')
-    # dt = 0.01
-    # show_animation = True   
 
     plotData(userInfo, trajsWithId, dt)

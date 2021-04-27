@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri Apr  9 10:43:38 2021
-
-@author: yaoli
+plot the comparision of three methods
 """
 
 import numpy as np
@@ -12,7 +10,7 @@ import statistics
 import pylab
 
 X = 0
-with open('result_sdd_ownMethod_1.txt') as f:
+with open('../result/result_sdd_ownMethod.txt') as f:
     liste = f.readlines()
     A1=[]
     A2=[]
@@ -25,7 +23,7 @@ with open('result_sdd_ownMethod_1.txt') as f:
         A2.append(float(line[2]))
         A3.append(float(line[3]))
         
-with open('result_sdd_simpleMeyerson_1.txt') as f:
+with open('../result/result_sdd_simpleMeyerson.txt') as f:
     liste = f.readlines()
     B1=[]
     B2=[]
@@ -39,7 +37,7 @@ with open('result_sdd_simpleMeyerson_1.txt') as f:
         B3.append(float(line[3]))
         #avg=float(line[1])
         
-with open('result_sdd_cohen_added_1.txt') as f:
+with open('../result/result_sdd_cohen_added.txt') as f:
     liste = f.readlines()
     C1=[]
     C2=[]
