@@ -57,26 +57,6 @@ count=0
     if x>1000:
         print(x,count)'''
 
-smother=100
-print(statistics.mean(A1[S:X]),statistics.mean(B1[S:X]))
-D1 = [float(a) / float(b) for a,b in zip(A1[S:X], B1[S:X])]
-D1smooth = [0] * X
-#print(len(D1))
-for i in range(0,X):
-    sumS=0.0
-    antal=0
-    
-    for j in range(max(0,i-smother),min(i+smother,X-1)):
-        #sumS+=D1[j]
-        antal+=1
-    D1smooth[i]=sumS/antal
-         
-
-plt.figure(0)
-plt.title('Smoothed rcatio (our algorithm)/(always recomputing)')
-plt.plot(D1smooth)
-plt.show()
-
 plt.figure(1)
 plt.ylabel('Cost')
 plt.plot(A1[S:X],label = 'Our Alg')
